@@ -74,7 +74,7 @@ export class UserController {
     },
   })
   async signUp(
-    @requestBody(registerRequestBody) register: {'email': string, 'username': string, 'password': string},
+    @requestBody(registerRequestBody) register: {'email': string, 'username': string, 'password': string, 'role': string},
   ): Promise<User | string> {
     const uniqueUsernameTest = await this.userDataRepository.usernameUniqueTest(register.username);
     if (uniqueUsernameTest !== null) return 'This username is already in use';
@@ -83,7 +83,7 @@ export class UserController {
       _.omit(register, 'password'),
     );
     await this.userRepository.userCredentials(savedUser.id).create({password});
-    await this.userDataRepository.contructOnNewRegister(savedUser.username, savedUser.id, savedUser.email);
+    await this.userDataRepository.contructOnNewRegister(savedUser.username, savedUser.id, savedUser.email, register.role);
     return savedUser;
   }
 

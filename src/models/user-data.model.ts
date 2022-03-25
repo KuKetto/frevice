@@ -19,6 +19,11 @@ export class UserData extends Entity {
   })
   email: string;
 
+  @property({
+    type: 'string',
+  })
+  role: string;
+
   constructor(data?: Partial<UserData>) {
     super(data);
   }

@@ -2,7 +2,7 @@ import {SchemaObject} from '@loopback/rest';
 
 const registerSchema: SchemaObject = {
   type: 'object',
-  required: ['email', 'username', 'password'],
+  required: ['email', 'username', 'password', 'role'],
   properties: {
     email: {
       type: 'string',
@@ -11,6 +11,9 @@ const registerSchema: SchemaObject = {
       type: 'string',
     },
     password: {
+      type: 'string',
+    },
+    role: {
       type: 'string',
     },
   },

@@ -10,7 +10,8 @@ const config = {
   user: '',
   password: '',
   database: 'FreVice',
-  useNewUrlParser: true
+  useNewUrlParser: true,
+  allowExtendedOperators: true
 };
 
 // Observe application's life cycle to disconnect the datasource when

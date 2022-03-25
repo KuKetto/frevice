@@ -17,13 +17,15 @@ export class UserDataRepository extends DefaultCrudRepository<
   async contructOnNewRegister(
     username: string | undefined,
     userID: string,
-    email: string
+    email: string,
+    role: string
   ): Promise<UserData> {
     return this.create(
       new UserData({
         userID: userID,
         username: username,
         email: email,
+        role: role
       })
     )
   }
