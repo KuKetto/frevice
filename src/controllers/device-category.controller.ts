@@ -69,7 +69,7 @@ export class DeviceCategoryController {
   async deleteFromTree(
     @param.path.string('categoryID') categoryID: typeof DeviceCategorys.prototype.categoryID
   ): Promise<DeviceCategorys | string> {
-    return this.deviceCategorysRepository.deleteFromTree(categoryID);
+    return this.deviceCategorysRepository.deleteFromTree(categoryID, this.professionRepository);
   }
 
   @put('/test')

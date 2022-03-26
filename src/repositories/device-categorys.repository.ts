@@ -247,7 +247,8 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
   }
 
   async deleteFromTree(
-    categoryID: string
+    categoryID: string,
+    profession: ProfessionRepository
   ): Promise<string> {
     try {
       const toDeleteCategory = await this.findById(categoryID);
@@ -283,6 +284,7 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
           }
         }
         await this.delete(toDeleteCategory);
+        await this.updateProfessionOnCategoryDeleted(profession, categoryID);
         return `Deleted root with ID: ${categoryID}`;
       }
       if (toDeleteCategory.childrenIDs === undefined) {
@@ -300,6 +302,7 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
           }
         }
         await this.delete(toDeleteCategory);
+        await this.updateProfessionOnCategoryDeleted(profession, categoryID);
         return `Deleted leaf with ID: ${categoryID}`;
       }
       for (const ancestor of toDeleteCategory.ancestorIDs) {
@@ -332,10 +335,33 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
         }
       }
       await this.delete(toDeleteCategory);
+      await this.updateProfessionOnCategoryDeleted(profession, categoryID);
       return `Succesfully deleted ${toDeleteCategory.categoryName} from tree`;
     } catch (error) {
     if (error.code === 'ENTITY_NOT_FOUND') {
       return 'Unexpected error: category not found by ID';
+    }
+    throw error;
+    }
+  }
+
+  async updateProfessionOnCategoryDeleted(
+    profession: ProfessionRepository,
+    categoryID: string
+  ): Promise<void> {
+    try {
+      const professionsContainingCurrentCategoryID = await profession.find({where: {
+        categorysKnown: {
+          regexp: categoryID
+        }
+      }});
+      for (const currentProfession of professionsContainingCurrentCategoryID) {
+        currentProfession.categorysKnown.splice(currentProfession.categorysKnown.indexOf(categoryID), 1);
+        await profession.replaceById(currentProfession.professionID, currentProfession);
+      }
+    } catch (error) {
+    if (error.code === 'ENTITY_NOT_FOUND') {
+      return;
     }
     throw error;
     }
