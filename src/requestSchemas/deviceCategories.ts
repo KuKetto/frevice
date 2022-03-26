@@ -93,3 +93,28 @@ export const deviceCategoryInsertRequestBody = {
     'application/json': {schema: deviceCategoryInsertSchema},
   },
 };
+
+const deviceCategoryUpdateSchema: SchemaObject = {
+  type: 'object',
+  required: [],
+  properties: {
+    categoryName: {
+      type: 'string',
+    },
+    defaultMaintanceSchedule: {
+      type: 'string',
+    },
+    maintanceRequirements: {
+      type: 'array',
+      items: maintanceReqSchema
+    },
+  },
+};
+
+export const deviceCategoryUpdateRequestBody = {
+  description: 'The input of new template',
+  required: true,
+  content: {
+    'application/json': {schema: deviceCategoryUpdateSchema},
+  },
+};

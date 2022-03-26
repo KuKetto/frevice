@@ -23,11 +23,16 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
     maintanceRequirements: Array<MaintanceRequirements>,
     professionRepo: ProfessionRepository
   ): Promise<string> {
+    let maintanceSchedule = defaultMaintanceSchedule;
+    if (maintanceSchedule === undefined) {
+      if (parentCategoryID === undefined) return 'Error: defaultMaintanceSchedule was given and cannot fetch it from undefined parentID';
+      else maintanceSchedule = await this.getMaintanceScheduleFromParent(parentCategoryID);
+    }
     const newCategory = await this.create(new DeviceCategorys({
       categoryID: await this.genCID(),
       parentID: parentCategoryID,
       categoryName: categoryName,
-      defaultMaintanceSchedule: defaultMaintanceSchedule,
+      defaultMaintanceSchedule: maintanceSchedule,
       maintanceRequirements: maintanceRequirements
     }));
     if (newCategory.parentID !== undefined) {
@@ -73,6 +78,59 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
       }
     }
     return 'success';
+  }
+
+  async updadeCategory(
+    categoryID: string,
+    categoryName: string,
+    defaultMaintanceSchedule: string,
+    maintanceRequirements: Array<MaintanceRequirements>,
+  ): Promise<DeviceCategorys | string> {
+    try {
+      const category = await this.findById(categoryID);
+      if (categoryName !== undefined) category.categoryName = categoryName;
+      if (defaultMaintanceSchedule !== undefined) category.defaultMaintanceSchedule = defaultMaintanceSchedule;
+      if (maintanceRequirements !== undefined) category.maintanceRequirements = maintanceRequirements;
+      await this.replaceById(categoryID, category);
+      return category;
+    } catch (error) {
+    if (error.code === 'ENTITY_NOT_FOUND') {
+      return 'Unexpected error: Category not found by ID';
+    }
+    throw error;
+    }
+  }
+
+  async getMaintanceScheduleFromParent(
+    parentID: string
+  ): Promise<string> {
+    try {
+      const parent = await this.findById(parentID);
+      return parent.defaultMaintanceSchedule;
+    } catch (error) {
+    if (error.code === 'ENTITY_NOT_FOUND') {
+      return 'Unexpected error: Parent category not found';
+    }
+    throw error;
+    }
+  }
+
+  async getByID(
+    categoryID: string
+  ): Promise<object> {
+    try {
+      const category = await this.findById(categoryID);
+      return {
+        categoryName: category.categoryName,
+        defaultMaintanceSchedule: category.defaultMaintanceSchedule,
+        maintanceRequirements: category.maintanceRequirements
+      }
+    } catch (error) {
+    if (error.code === 'ENTITY_NOT_FOUND') {
+      return {error: 'Unexpected error: Category not found by ID'};
+    }
+    throw error;
+    }
   }
 
   async getHierarchyTree(): Promise<Array<object>> {
@@ -125,7 +183,6 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
           categoryName: descendant.categoryName,
           childrens: []
         });
-        //descendantsOfRoot.splice(descendantsOfRoot.indexOf(descendant), 1);
       }
     }
     if (descendantsOfRoot.length === 0) return responseArray;
@@ -184,6 +241,101 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
     } catch (error) {
     if (error.code === 'ENTITY_NOT_FOUND') {
       return 'Unexpected error: Category by id not found';
+    }
+    throw error;
+    }
+  }
+
+  async deleteFromTree(
+    categoryID: string
+  ): Promise<string> {
+    try {
+      const toDeleteCategory = await this.findById(categoryID);
+      if (toDeleteCategory.parentID === undefined) {
+        for (const childOfRoot of toDeleteCategory.childrenIDs) {
+          try {
+            const child = await this.findById(childOfRoot);
+            await this.delete(child);
+            await this.create({
+              categoryID: child.categoryID,
+              categoryName: child.categoryName,
+              childrenIDs: child.childrenIDs,
+              descendantsIDs: child.descendantsIDs,
+              maintanceRequirements: child.maintanceRequirements,
+              defaultMaintanceSchedule: child.defaultMaintanceSchedule
+            });
+          } catch (error) {
+          if (error.code === 'ENTITY_NOT_FOUND') {
+            return 'Unexpected error: category not found by ID';
+          }
+          throw error;
+          }
+        }
+        const hasDeletedIDInAncestors = await this.find({where:{
+          ancestorIDs: {
+            regexp: categoryID
+          }
+        }});
+        if (hasDeletedIDInAncestors.length > 0) {
+          for (const ancestor of hasDeletedIDInAncestors) {
+            ancestor.ancestorIDs.splice(ancestor.ancestorIDs.indexOf(categoryID), 1);
+            await this.replaceById(ancestor.categoryID, ancestor);
+          }
+        }
+        await this.delete(toDeleteCategory);
+        return `Deleted root with ID: ${categoryID}`;
+      }
+      if (toDeleteCategory.childrenIDs === undefined) {
+        for (const ancestor of toDeleteCategory.ancestorIDs) {
+          try {
+            const currentAncestor = await this.findById(ancestor);
+            if (currentAncestor.categoryID === toDeleteCategory.parentID) currentAncestor.childrenIDs.splice(currentAncestor.childrenIDs.indexOf(categoryID), 1);
+            currentAncestor.descendantsIDs.splice(currentAncestor.descendantsIDs.indexOf(categoryID, 1));
+            await this.replaceById(ancestor, currentAncestor);
+          } catch (error) {
+          if (error.code === 'ENTITY_NOT_FOUND') {
+            return 'Unexpected error: category not found by ID';
+          }
+          throw error;
+          }
+        }
+        await this.delete(toDeleteCategory);
+        return `Deleted leaf with ID: ${categoryID}`;
+      }
+      for (const ancestor of toDeleteCategory.ancestorIDs) {
+        try {
+          const currentAncestor = await this.findById(ancestor);
+          if (currentAncestor.categoryID === toDeleteCategory.parentID) {
+            currentAncestor.childrenIDs.splice(currentAncestor.childrenIDs.indexOf(categoryID), 1)
+            for (const child of toDeleteCategory.childrenIDs) currentAncestor.childrenIDs.push(child);
+          };
+          currentAncestor.descendantsIDs.splice(currentAncestor.descendantsIDs.indexOf(categoryID, 1));
+          await this.replaceById(ancestor, currentAncestor);
+        } catch (error) {
+        if (error.code === 'ENTITY_NOT_FOUND') {
+          return 'Unexpected error: category not found by ID';
+        }
+        throw error;
+        }
+      }
+      for (const child of toDeleteCategory.childrenIDs) {
+        try {
+          const currentChild = await this.findById(child);
+          currentChild.ancestorIDs.splice(currentChild.ancestorIDs.indexOf(categoryID));
+          currentChild.parentID = toDeleteCategory.parentID;
+          await this.replaceById(child, currentChild);
+        } catch (error) {
+        if (error.code === 'ENTITY_NOT_FOUND') {
+          return 'Unexpected error: category not found by ID';
+        }
+        throw error;
+        }
+      }
+      await this.delete(toDeleteCategory);
+      return `Succesfully deleted ${toDeleteCategory.categoryName} from tree`;
+    } catch (error) {
+    if (error.code === 'ENTITY_NOT_FOUND') {
+      return 'Unexpected error: category not found by ID';
     }
     throw error;
     }
