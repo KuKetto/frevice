@@ -1,6 +1,6 @@
 import {inject} from '@loopback/core';
 import {DefaultCrudRepository} from '@loopback/repository';
-import {DeviceCategorysRepository} from '.';
+import {DeviceCategorysRepository, DeviceRepository} from '.';
 import {MongoDbDataSource} from '../datasources';
 import {Profession, ProfessionRelations} from '../models';
 import {genID} from '../services/id-gen';
@@ -19,7 +19,8 @@ export class ProfessionRepository extends DefaultCrudRepository<
   async createNewProfession(
     professionName: string,
     selectedCategoryID: string,
-    categoryRepo: DeviceCategorysRepository
+    categoryRepo: DeviceCategorysRepository,
+    deviceRepo: DeviceRepository
   ): Promise<Profession | string> {
     const category = await categoryRepo.findOne({where: {
       categoryID: selectedCategoryID
@@ -28,11 +29,19 @@ export class ProfessionRepository extends DefaultCrudRepository<
     let categorysKnown = category.descendantsIDs;
     if (categorysKnown === undefined) categorysKnown = [];
     categorysKnown.push(selectedCategoryID);
-    return this.create({
+    const professionCreated = await this.create({
       professionID: await this.genPID(),
       professionName: professionName,
       categorysKnown: categorysKnown
     });
+    const devices = await deviceRepo.find();
+    for (const device of devices) {
+      if (categorysKnown.indexOf(device.categoryID) > -1) {
+        device.professionIDs.push(professionCreated.professionID);
+        await deviceRepo.replaceById(device.deviceID, device);
+      }
+    }
+    return professionCreated;
   }
 
   async updateProfession(

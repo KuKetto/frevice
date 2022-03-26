@@ -8,7 +8,7 @@ import {
   response
 } from '@loopback/rest';
 import {Profession} from '../models';
-import {DeviceCategorysRepository, ProfessionRepository} from '../repositories';
+import {DeviceCategorysRepository, DeviceRepository, ProfessionRepository} from '../repositories';
 import {newProfessionRequestBody, updateProfessionRequestBody} from '../requestSchemas/profession';
 
 @authenticate('jwt')
@@ -18,6 +18,8 @@ export class ProfessionController {
     public professionRepository : ProfessionRepository,
     @repository(DeviceCategorysRepository)
     public deviceCategorysRepository : DeviceCategorysRepository,
+    @repository(DeviceRepository)
+    public deviceRepository : DeviceRepository,
   ) {}
 
   @post('/professions')
@@ -27,7 +29,7 @@ export class ProfessionController {
   async create(
     @requestBody(newProfessionRequestBody) newProfession: {'professionName': string, 'selectedCategoryID': string}
   ): Promise<Profession | string> {
-    return this.professionRepository.createNewProfession(newProfession.professionName, newProfession.selectedCategoryID, this.deviceCategorysRepository);
+    return this.professionRepository.createNewProfession(newProfession.professionName, newProfession.selectedCategoryID, this.deviceCategorysRepository, this.deviceRepository);
   }
 
   @get('/professions')
