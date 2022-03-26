@@ -9,7 +9,9 @@ Main dev: Say Domonkos
 
   - ### /device-categories
     Method: **PATCH**
+    
     Description: `Add new deviceCategory`
+    
     Request body:
 
       ```json
@@ -27,6 +29,7 @@ Main dev: Say Domonkos
       ```
 
     Required: `categoryName`
+    
     Responds:
 
     ```typescript
@@ -36,7 +39,9 @@ Main dev: Say Domonkos
   
   - ### /device-categories
     Method: **GET**
+    
     Description: `Get DeviceCategorys hirearchy model`
+    
     Responds:
     ```json
     [
@@ -66,7 +71,9 @@ Main dev: Say Domonkos
     ```
   - ### /device-categories/${parentCategoryID}
     Method: **PATCH**
+    
     Description: `Insert category inside a tree`
+    
     Request:
     ```json
     {
@@ -90,7 +97,9 @@ Main dev: Say Domonkos
     ```
   - ### /device-categories/${categoryID}
     Method: **DELETE**
+    
     Description: `Delete category`
+    
     Respond:
     ```typescript
     'Unexpected error: category not found by ID'
@@ -100,7 +109,9 @@ Main dev: Say Domonkos
     ```
   - ### /device-categories/${categoryID}
     Method: **GET**
+    
     Description: `Get device info by ID`
+    
     Respond:
     ```json
     {
@@ -111,7 +122,9 @@ Main dev: Say Domonkos
     ```
   - ### /device-categories/${categoryID}
     Method: **PATCH**
+    
     Description: `Update deviceCategory data by ID`
+    
     Request:
     ```json
         {
@@ -134,11 +147,13 @@ Main dev: Say Domonkos
     ```
   - ### /test
     Method: **PUT**
+    
     Description: `Make test categories by n times`
+    
     Request:
     ```json
     {
-        "n": number
+        "n": "number"
     }
     ```
     Respond:
@@ -147,12 +162,15 @@ Main dev: Say Domonkos
     ```
   - ### /test
     Method: **DELETE**
+    
     Description: `Drop all dump test category`
 
 - # DeviceController
     - ### /devices
         Method: **POST**
+        
         Description: `Add new device`
+        
         Request:
         ```json
         {
@@ -165,13 +183,16 @@ Main dev: Say Domonkos
         ```
     
         Required: `deviceName, categoryID, productID, location, description`
+        
         Responds:
         ```typescript
         Device model
         ```
     - ### /devices
         Method: **GET**
+        
         Description: `Get list of devices`
+        
         Responds:
         ```json
         [
@@ -191,7 +212,9 @@ Main dev: Say Domonkos
         ```
     - ### /devices/${deviceID}
         Method: **GET**
+        
         Description: `Get device info by ID`
+        
         Responds:
         ```json
         {
@@ -205,7 +228,9 @@ Main dev: Say Domonkos
         ```
      - ### /devices/${deviceID}
         Method: **PATCH**
+        
         Description: `Update device by ID`
+        
         Request:
         ```json
         {
@@ -223,7 +248,9 @@ Main dev: Say Domonkos
         ```
     - ### /devices/${deviceID}
         Method: **DELETE**
+        
         Description: `Delete device by ID`
+        
         Responds:
         ```typescript
         'Succesfully deleted' + deviceName
@@ -232,15 +259,18 @@ Main dev: Say Domonkos
 - # ProfessionController
     - ### /professions
         Method: **POST**
+        
         Description: `Add new profession`
+        
         Request:
         ```json
         {
           "professionName": "test profession",
           "selectedCategoryID": "1j7fgl731vf0rnpzf1flwq"
         }
-        Required: `professionName, selectedCategoryID`
         ```
+        Required: `professionName, selectedCategoryID`
+        
         Responds:
         ```typescript
         Profession model
@@ -248,7 +278,9 @@ Main dev: Say Domonkos
         ```
     - ### /professions
         Method: **GET**
+        
         Description: `Get list of professions` 
+        
         Respond:
         ```json
         [
@@ -267,7 +299,9 @@ Main dev: Say Domonkos
         ]
     - ### /professions/${professionID}
         Method: **GET**
+        
         Description: `Get profession info by ID` 
+        
         Respond:
         ```json
         {
@@ -279,7 +313,9 @@ Main dev: Say Domonkos
         ```
     - ### /professions/${professionID}
         Method: **PATCH**
+        
         Description: `Update profession by ID` 
+        
         Request:
         ```json
         {
@@ -293,7 +329,9 @@ Main dev: Say Domonkos
         ```
     - ### /professions/${professionID}
         Method: **DELETE**
+        
         Description: `Delete profession by ID` 
+        
         Respond:
         ```typescript
         'Succesfully deleted' + professionName + 'profession'
@@ -302,7 +340,9 @@ Main dev: Say Domonkos
 - # UserController
     - ### /signup
         Method: **Post**
+        
         Description: `Register` 
+        
         Request:
         ```json
         {
@@ -312,7 +352,9 @@ Main dev: Say Domonkos
           "role": "string"
         }
         ```
+        
         Required: `email, username, password, role`
+        
         Responds:
         ```json
         {
@@ -325,7 +367,9 @@ Main dev: Say Domonkos
         ```
     - ### /login
         Method: **Post**
+        
         Description: `Login` 
+        
         Request:
         ```json
         {
@@ -335,6 +379,7 @@ Main dev: Say Domonkos
         }
         ```
         Required: `password`
+        
         Responds:
         ```json
         {
