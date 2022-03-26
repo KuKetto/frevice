@@ -72,7 +72,7 @@ export class UserController {
     if (email === undefined) {
       const user = await this.userDataRepository.getMail(username);
       if (user === null) return 'username not found';
-      if (user?.email === undefined) return 'Unexcepted error'
+      if (user?.email === undefined) return 'Unexcepted error: email and username was not given or found'
       return this.userService.verifyCredentials({
         email: user?.email,
         password: password
