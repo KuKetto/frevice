@@ -91,4 +91,13 @@ export class DeviceCategoryController {
       await this.deviceCategorysRepository.newCategory(getRandomParent?.categoryID, `${i}`, 'testSchedule', [], this.professionRepository);
     }
   }
+
+  @del('/test')
+  @response(200, {
+    description: 'Profession model instance',
+  })
+  async deleteTestData(): Promise<void> {
+    await this.deviceCategorysRepository.deleteAll();
+    return;
+  }
 }
