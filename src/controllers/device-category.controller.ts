@@ -1,9 +1,11 @@
+import {authenticate} from '@loopback/authentication';
 import {repository} from '@loopback/repository';
 import {del, get, param, patch, put, requestBody, response} from '@loopback/rest';
 import {DeviceCategorys, MaintanceRequirements} from '../models';
 import {DeviceCategorysRepository, ProfessionRepository} from '../repositories';
 import {deviceCategoryInsertRequestBody, deviceCategoryRequestBody, deviceCategoryUpdateRequestBody, testGenRequestBody} from '../requestSchemas/deviceCategories';
 
+@authenticate('jwt')
 export class DeviceCategoryController {
   constructor(
     @repository(DeviceCategorysRepository)
@@ -14,7 +16,7 @@ export class DeviceCategoryController {
 
   @patch('/device-categories')
   @response(200, {
-    description: 'DeviceCategorys model hirearchy',
+    description: 'Add new deviceCategory',
   })
   async createNewCategory(
     @requestBody(deviceCategoryRequestBody) newDeviceCategory: {'parentCategoryID':string, 'categoryName':string, 'defaultMaintanceSchedule':string, 'maintanceRequirements': Array<MaintanceRequirements>}
@@ -24,7 +26,7 @@ export class DeviceCategoryController {
 
   @patch('/device-categories/${categoryID}')
   @response(200, {
-    description: 'DeviceCategorys model hirearchy',
+    description: 'Update deviceCategory data by ID',
   })
   async updateCategory(
     @requestBody(deviceCategoryUpdateRequestBody) updateCategory: {'categoryName':string, 'defaultMaintanceSchedule':string, 'maintanceRequirements': Array<MaintanceRequirements>},
@@ -35,7 +37,7 @@ export class DeviceCategoryController {
 
   @get('/device-categories/${categoryID}')
   @response(200, {
-    description: 'DeviceCategorys model hirearchy',
+    description: 'Get device info by ID',
   })
   async getCategoryInfo(
     @param.path.string('categoryID') categoryID: typeof DeviceCategorys.prototype.categoryID
@@ -45,7 +47,7 @@ export class DeviceCategoryController {
 
   @get('/device-categories')
   @response(200, {
-    description: 'DeviceCategorys model hirearchy',
+    description: 'Get DeviceCategorys hirearchy model',
   })
   async getHiearchyTree(): Promise<Array<object>> {
     return this.deviceCategorysRepository.getHierarchyTree();
@@ -53,7 +55,7 @@ export class DeviceCategoryController {
 
   @patch('/device-categories/${parentCategoryID}')
   @response(200, {
-    description: 'DeviceCategorys model hirearchy',
+    description: 'Insert category inside a tree',
   })
   async insertIntoTree(
     @requestBody(deviceCategoryInsertRequestBody) newDeviceCategory: {'whichChildID':string, 'categoryName':string, 'defaultMaintanceSchedule':string, 'maintanceRequirements': Array<MaintanceRequirements>},
@@ -64,7 +66,7 @@ export class DeviceCategoryController {
 
   @del('/device-categories/${categoryID}')
   @response(200, {
-    description: 'DeviceCategorys model hirearchy',
+    description: 'Delete category',
   })
   async deleteFromTree(
     @param.path.string('categoryID') categoryID: typeof DeviceCategorys.prototype.categoryID
@@ -74,7 +76,7 @@ export class DeviceCategoryController {
 
   @put('/test')
   @response(200, {
-    description: 'DeviceCategorys model hirearchy',
+    description: 'Make test categories by n times',
   })
   async genNRandomValue(
     @requestBody(testGenRequestBody) testGen: {'n':number, 'parentID': string}
@@ -94,7 +96,7 @@ export class DeviceCategoryController {
 
   @del('/test')
   @response(200, {
-    description: 'Profession model instance',
+    description: 'Drop all dump test category',
   })
   async deleteTestData(): Promise<void> {
     await this.deviceCategorysRepository.deleteAll();

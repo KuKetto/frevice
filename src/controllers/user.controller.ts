@@ -10,7 +10,8 @@ import {inject} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {
   post,
-  requestBody
+  requestBody,
+  response
 } from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 import {genSalt, hash} from 'bcryptjs';
@@ -30,24 +31,9 @@ export class UserController {
     @repository(UserDataRepository) public userDataRepository: UserDataRepository,
   ) {}
 
-  @post('/users/login', {
-    responses: {
-      '200': {
-        description: 'Token',
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-              properties: {
-                token: {
-                  type: 'string',
-                },
-              },
-            },
-          },
-        },
-      },
-    },
+  @post('/users/login')
+  @response(200, {
+    description: 'Login',
   })
   async login(
     @requestBody(loginRequestBody) credentials: {'email': string, 'username': string, 'password': string},
@@ -59,19 +45,9 @@ export class UserController {
     return {token};
   }
 
-  @post('/signup', {
-    responses: {
-      '200': {
-        description: 'User',
-        content: {
-          'application/json': {
-            schema: {
-              'x-ts-type': User,
-            },
-          },
-        },
-      },
-    },
+  @post('/signup')
+  @response(200, {
+    description: 'Register',
   })
   async signUp(
     @requestBody(registerRequestBody) register: {'email': string, 'username': string, 'password': string, 'role': string},

@@ -98,6 +98,19 @@ export class ProfessionRepository extends DefaultCrudRepository<
     }
   }
 
+  async getProfessions(): Promise<Array<object>> {
+    const professions = await this.find();
+    const responseArray: Array<{
+      professionID: string,
+      professionName: string
+    }> = [];
+    for (const profession of professions) responseArray.push({
+      professionID: profession.professionID,
+      professionName: profession.professionName
+    });
+    return responseArray;
+  }
+
   async genPID(): Promise<string> {
     const id = genID();
     return await this.checkPID(id) === false ? id : this.genPID();

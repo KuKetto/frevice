@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   repository
 } from '@loopback/repository';
@@ -13,6 +14,7 @@ import {Device} from '../models';
 import {DeviceCategorysRepository, DeviceRepository, ProfessionRepository} from '../repositories';
 import {createDeviceRequestBody, updateDeviceRequestBody} from '../requestSchemas/device';
 
+@authenticate('jwt')
 export class DeviceController {
   constructor(
     @repository(DeviceRepository)
@@ -25,7 +27,7 @@ export class DeviceController {
 
   @post('/devices')
   @response(200, {
-    description: 'Device model instance',
+    description: 'Add new device',
   })
   async create(
     @requestBody(createDeviceRequestBody) newDevice: {'deviceName':string, 'categoryID':string, 'productID':string, 'location':string, 'description':string}
@@ -35,7 +37,7 @@ export class DeviceController {
 
   @patch('/devices/${deviceID}')
   @response(200, {
-    description: 'Device model instance',
+    description: 'Update device by ID',
   })
   async update(
     @requestBody(updateDeviceRequestBody) deviceToUpdate: {'deviceName':string, 'categoryID':string, 'productID':string, 'location':string, 'description':string},
@@ -46,7 +48,7 @@ export class DeviceController {
 
   @get('/devices')
   @response(200, {
-    description: 'Device model instance',
+    description: 'Get list of devices',
   })
   async getDevices(): Promise<Array<object> | string> {
     return this.deviceRepository.getDeviceList();
@@ -54,7 +56,7 @@ export class DeviceController {
 
   @get('/devices/${deviceID}')
   @response(200, {
-    description: 'Device model instance',
+    description: 'Get device info by ID',
   })
   async getDevice(
     @param.path.string('deviceID') deviceID: typeof Device.prototype.deviceID
@@ -64,7 +66,7 @@ export class DeviceController {
 
   @del('/devices/${deviceID}')
   @response(200, {
-    description: 'Device model instance',
+    description: 'Delete device by ID',
   })
   async deleteDevice(
     @param.path.string('deviceID') deviceID: typeof Device.prototype.deviceID

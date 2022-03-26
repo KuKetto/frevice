@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   repository
 } from '@loopback/repository';
@@ -10,6 +11,7 @@ import {Profession} from '../models';
 import {DeviceCategorysRepository, ProfessionRepository} from '../repositories';
 import {newProfessionRequestBody, updateProfessionRequestBody} from '../requestSchemas/profession';
 
+@authenticate('jwt')
 export class ProfessionController {
   constructor(
     @repository(ProfessionRepository)
@@ -20,7 +22,7 @@ export class ProfessionController {
 
   @post('/professions')
   @response(200, {
-    description: 'Profession model instance',
+    description: 'Add new profession',
   })
   async create(
     @requestBody(newProfessionRequestBody) newProfession: {'professionName': string, 'selectedCategoryID': string}
@@ -30,15 +32,15 @@ export class ProfessionController {
 
   @get('/professions')
   @response(200, {
-    description: 'Profession model instance',
+    description: 'Get list of professions',
   })
-  async getProfessions(): Promise<Profession[]> {
-    return this.professionRepository.find();
+  async getProfessions(): Promise<Array<object>> {
+    return this.professionRepository.getProfessions();
   }
 
   @get('/professions/${professionID}')
   @response(200, {
-    description: 'Profession model instance',
+    description: 'Get profession info by ID',
   })
   async getProfessionInfo(
     @param.path.string('professionID') professionID: typeof Profession.prototype.professionID
@@ -48,7 +50,7 @@ export class ProfessionController {
 
   @patch('/professions/${professionID}')
   @response(200, {
-    description: 'Profession model instance',
+    description: 'Update profession by ID',
   })
   async updateProfession(
     @requestBody(updateProfessionRequestBody) updateProfession: {'professionName': string},
@@ -59,7 +61,7 @@ export class ProfessionController {
 
   @del('/professions/${professionID}')
   @response(200, {
-    description: 'Profession model instance',
+    description: 'Delete profession by ID',
   })
   async deleteProfession(
     @param.path.string('professionID') professionID: typeof Profession.prototype.professionID
