@@ -1,8 +1,8 @@
 import {repository} from '@loopback/repository';
-import {get, patch, put, requestBody, response} from '@loopback/rest';
-import {MaintanceRequirements} from '../models';
+import {get, param, patch, put, requestBody, response} from '@loopback/rest';
+import {DeviceCategorys, MaintanceRequirements} from '../models';
 import {DeviceCategorysRepository, ProfessionRepository} from '../repositories';
-import {deviceCategoryRequestBody, testGenRequestBody} from '../requestSchemas/deviceCategories';
+import {deviceCategoryInsertRequestBody, deviceCategoryRequestBody, testGenRequestBody} from '../requestSchemas/deviceCategories';
 
 export class DeviceCategoryController {
   constructor(
@@ -28,6 +28,17 @@ export class DeviceCategoryController {
   })
   async getHiearchyTree(): Promise<Array<object>> {
     return this.deviceCategorysRepository.getHierarchyTree();
+  }
+
+  @patch('/device-categories/${parentCategoryID}')
+  @response(200, {
+    description: 'DeviceCategorys model hirearchy',
+  })
+  async insertIntoTree(
+    @requestBody(deviceCategoryInsertRequestBody) newDeviceCategory: {'whichChildID':string, 'categoryName':string, 'defaultMaintanceSchedule':string, 'maintanceRequirements': Array<MaintanceRequirements>},
+    @param.path.string('parentCategoryID') parentCategoryID: typeof DeviceCategorys.prototype.categoryID
+  ): Promise<DeviceCategorys | string> {
+    return this.deviceCategorysRepository.insertIntoTree(parentCategoryID, newDeviceCategory.whichChildID,newDeviceCategory.categoryName, newDeviceCategory.defaultMaintanceSchedule, newDeviceCategory.maintanceRequirements, this.professionRepository);
   }
 
   @put('/test')

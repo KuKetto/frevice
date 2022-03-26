@@ -69,7 +69,7 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
       }});
       for (const profession of findProfessionsIfExist) {
         profession.categorysKnown.push(newCategory.categoryID);
-        professionRepo.replaceById(profession.professionID, profession)
+        await professionRepo.replaceById(profession.professionID, profession)
       }
     }
     return 'success';
@@ -139,6 +139,54 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
       foundChild.childrens = newChildArray;
     }
     return responseArray;
+  }
+
+  async insertIntoTree(
+    parentCategoryID: string,
+    whichChildID: string,
+    categoryName: string,
+    defaultMaintanceSchedule: string,
+    maintanceRequirements: Array<MaintanceRequirements>,
+    professionRepo: ProfessionRepository
+  ): Promise<DeviceCategorys | string> {
+    try {
+      const parent = await this.findById(parentCategoryID);
+      const whichChildToLowerInTree = await this.findById(whichChildID);
+      const newCategoryChildrenArray = [whichChildID];
+      const newCategoryDescendantIDArray = whichChildToLowerInTree.descendantsIDs;
+      newCategoryDescendantIDArray.push(whichChildID);
+      const newCategory = await this.create(new DeviceCategorys({
+        categoryID: await this.genCID(),
+        parentID: parentCategoryID,
+        ancestorIDs: whichChildToLowerInTree.ancestorIDs,
+        descendantsIDs: newCategoryDescendantIDArray,
+        childrenIDs: newCategoryChildrenArray,
+        categoryName: categoryName,
+        defaultMaintanceSchedule: defaultMaintanceSchedule,
+        maintanceRequirements: maintanceRequirements
+      }));
+      parent.childrenIDs[parent.childrenIDs.indexOf(whichChildID)] = newCategory.categoryID;
+      parent.descendantsIDs.push(newCategory.categoryID);
+      await this.replaceById(parentCategoryID, parent);
+      whichChildToLowerInTree.parentID = newCategory.categoryID;
+      whichChildToLowerInTree.ancestorIDs.push(newCategory.categoryID);
+      await this.replaceById(whichChildID, whichChildToLowerInTree);
+      const findProfessionsIfExist = await professionRepo.find({where: {
+        categorysKnown: {
+          regexp: parentCategoryID
+        }
+      }});
+      for (const profession of findProfessionsIfExist) {
+        profession.categorysKnown.push(newCategory.categoryID);
+        await professionRepo.replaceById(profession.professionID, profession)
+      }
+      return newCategory;
+    } catch (error) {
+    if (error.code === 'ENTITY_NOT_FOUND') {
+      return 'Unexpected error: Category by id not found';
+    }
+    throw error;
+    }
   }
 
   async genCID(): Promise<string> {

@@ -65,3 +65,31 @@ export const testGenRequestBody = {
     'application/json': {schema: testGenSchema},
   },
 };
+
+const deviceCategoryInsertSchema: SchemaObject = {
+  type: 'object',
+  required: ['categoryName'],
+  properties: {
+    whichChildID: {
+      type: 'string',
+    },
+    categoryName: {
+      type: 'string',
+    },
+    defaultMaintanceSchedule: {
+      type: 'string',
+    },
+    maintanceRequirements: {
+      type: 'array',
+      items: maintanceReqSchema
+    },
+  },
+};
+
+export const deviceCategoryInsertRequestBody = {
+  description: 'The input of new template',
+  required: true,
+  content: {
+    'application/json': {schema: deviceCategoryInsertSchema},
+  },
+};
