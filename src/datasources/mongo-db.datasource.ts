@@ -5,7 +5,7 @@ const config = {
   name: 'MongoDB',
   connector: 'mongodb',
   url: '',
-  host: 'localhost',
+  host: process.env.MONGO_HOST ? process.env.MONGO_HOST : 'localhost',
   port: 27017,
   user: '',
   password: '',

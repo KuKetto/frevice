@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+
+  api:
+    container_name: api
+    build: .
+    environment:
+      - MONGO_HOST=mongodb
+    ports:
+      - 42069:42069
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:5.0
+    volumes:
+      - ../volumes/mongo:/data/db

@@ -9,7 +9,7 @@ export async function main(options: ApplicationConfig = {}) {
 
   const url = app.restServer.url;
   console.log(`Server is running at ${url}`);
-  console.log(`Try ${url}/ping`);
+  console.log(`Try ${url}/explorer`);
 
   return app;
 }
@@ -25,9 +25,18 @@ if (require.main === module) {
       // (don't force-close). If you want to immediately destroy all sockets
       // upon stop, set its value to `0`.
       // See https://www.npmjs.com/package/stoppable
+
+      //deploy esetén kikommentelendő:
+      // apiExplorer: {
+      //   disabled: true,
+      // },
+
       gracePeriodForClose: 5000, // 5 seconds
       openApiSpec: {
         // useful when used with OpenAPI-to-GraphQL to locate your application
+
+        //deploy esetén kikommentelendő:
+        //disabled: true
         setServersFromRequest: true,
       },
     },
