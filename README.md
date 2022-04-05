@@ -1,31 +1,66 @@
 ## FreshDevice
 
 Project's backend
+
 Main dev: Say Domonkos
+
 2022 - made for Advanced System Design course in Pannon Egyetem
+
 Description can be found at: https://drive.google.com/file/d/159JXkVaUkou1B4rcBWNNzs-A_Ihhh7w4/view?usp=sharing
 
-Usage:
+# Usage:
+
 After cloning the repo: 
+
 `npm install` to install the node modules
 
 MongoDB settings can be found in the datasource directory inside of src, username and password could be added here and inside the docker-compose.yml to make authentication (In this project the database only used in localhost, in case of deployment it's port should not be forwarded out)
-In case of docker compose 2.x: `docker compose up -d` starts  up a localhost mongodb, if you want to stop it: `docker compose down`
-In case of docker compose 1.x: `docker-compose up -d` and to stop it: `docker-compose down`
+
+#### In case of docker compose 2.x: 
+
+to start up localhost mongodb: `docker compose up -d`
+
+to stop it: `docker compose down`
+
+#### In case of docker compose 1.x: 
+
+to start up localhost mongodb: `docker-compose up -d` 
+
+to stop it: `docker-compose down`
+
+#### Loopback startup
 
 `npm start` to startup the project, now the project should be running at `http://localhost:3000/`
 
-To deploy the application:
-In case of docker compose 2.x: `docker compose -f docker-compose.prod.yml up -d` to stop it `docker compose -f docker-compose.prod.yml down`
-In case of docker compose 1.x: `docker-compose -f docker-compose.prod.yml up -d` to stop it `docker-compose -f docker-compose.prod.yml down`
+# To deploy the application:
+
+#### In case of docker compose 2.x: 
+
+to start up `docker compose -f docker-compose.prod.yml up -d` 
+
+to stop it `docker compose -f docker-compose.prod.yml down`
+
+#### In case of docker compose 1.x: 
+
+to start up `docker-compose -f docker-compose.prod.yml up -d` 
+
+to stop it `docker-compose -f docker-compose.prod.yml down`
+
 This will run the database and the API aswell inside a docker. Port 42069 should be forwarded out and project is live at `[ip]:42069`. 
+
 For security reason in src/application.ts and src/index.ts option should be uncommented / commented as seen to disable explorer and the OpenAPI.json file.
 
-Tasks to implement:
--Frontend fetch the hiearchy tree by: child by child
-To optimize web client running time new getRoots and getChildrenOfSelectedCategoryID API endpoints should be added.
+# Tasks to implement:
 
--Destory token on logout
+- Frontend fetch use hiearchy tree as the following: 
+  - Dropdown - root, 
+  - Dropdown (shown if root is selected): childOfRoot, 
+  - Dropdown (shown if child was selected in previous dropdown): childOfParent
+  - .... 
+  
+  To optimize web client running time new getRoots and getChildrenOfSelectedCategoryID API endpoints should be added.
+
+- Destory token on logout
 
 - # DeviceCategoryController
 
