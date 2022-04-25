@@ -17,6 +17,11 @@ export class UserData extends Entity {
   @property({
     type: 'string',
   })
+  salt: string;
+
+  @property({
+    type: 'string',
+  })
   email: string;
 
   @property({

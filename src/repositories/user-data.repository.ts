@@ -18,12 +18,14 @@ export class UserDataRepository extends DefaultCrudRepository<
     username: string | undefined,
     userID: string,
     email: string,
-    role: string
+    role: string,
+    userSalt: string
   ): Promise<UserData> {
     return this.create(
       new UserData({
         userID: userID,
         username: username,
+        salt: userSalt,
         email: email,
         role: role
       })
@@ -40,5 +42,14 @@ export class UserDataRepository extends DefaultCrudRepository<
     username: string
   ): Promise<UserData | null> {
     return this.findOne({where: {username: username}});
+  }
+
+  async getUserSalt(
+    mail: string
+  ): Promise<string | undefined> {
+    const user = await this.findOne({where: {
+      email: mail
+    }})
+    return user?.salt;
   }
 }

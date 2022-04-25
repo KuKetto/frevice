@@ -14,10 +14,11 @@ import {
   response
 } from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
-import {genSalt, hash} from 'bcryptjs';
+import {hash} from 'bcryptjs';
 import _ from 'lodash';
 import {UserDataRepository} from '../repositories';
 import {loginRequestBody, registerRequestBody} from '../requestSchemas/user';
+import {genSalt} from '../services/salt_gen';
 
 export class UserController {
   constructor(
@@ -54,12 +55,13 @@ export class UserController {
   ): Promise<User | string> {
     const uniqueUsernameTest = await this.userDataRepository.usernameUniqueTest(register.username);
     if (uniqueUsernameTest !== null) return 'This username is already in use';
-    const password = await hash(register.password, await genSalt());
+    const newSalt = genSalt();
+    const password = await hash(register.password + newSalt, 0);
     const savedUser = await this.userRepository.create(
       _.omit(register, 'password'),
     );
     await this.userRepository.userCredentials(savedUser.id).create({password});
-    await this.userDataRepository.contructOnNewRegister(savedUser.username, savedUser.id, savedUser.email, register.role);
+    await this.userDataRepository.contructOnNewRegister(savedUser.username, savedUser.id, savedUser.email, register.role, newSalt);
     return savedUser;
   }
 
@@ -75,12 +77,12 @@ export class UserController {
       if (user?.email === undefined) return 'Unexcepted error: email and username was not given or found'
       return this.userService.verifyCredentials({
         email: user?.email,
-        password: password
+        password: password + user.salt
       })
     }
     return this.userService.verifyCredentials({
       email: email,
-      password: password
+      password: password + await this.userDataRepository.getUserSalt(email)
     })
   }
 }
