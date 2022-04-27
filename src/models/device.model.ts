@@ -41,6 +41,16 @@ export class Device extends Entity {
   })
   description: string;
 
+  @property({
+    type: 'string',
+  })
+  lastMaintance: string;
+
+  @property({
+    type: 'string',
+  })
+  nextMaintance: string;
+
 
   constructor(data?: Partial<Device>) {
     super(data);

@@ -19,7 +19,7 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
   async newCategory(
     parentCategoryID: string,
     categoryName: string,
-    defaultMaintanceSchedule: string,
+    defaultMaintanceSchedule: number,
     maintanceRequirements: Array<MaintanceRequirements>,
     professionRepo: ProfessionRepository
   ): Promise<string> {
@@ -27,6 +27,7 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
     if (maintanceSchedule === undefined) {
       if (parentCategoryID === undefined) return 'Error: defaultMaintanceSchedule was given and cannot fetch it from undefined parentID';
       else maintanceSchedule = await this.getMaintanceScheduleFromParent(parentCategoryID);
+      if (maintanceSchedule === -1) return 'Unexpected error: parent category not found'
     }
     const newCategory = await this.create(new DeviceCategorys({
       categoryID: await this.genCID(),
@@ -83,7 +84,7 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
   async updadeCategory(
     categoryID: string,
     categoryName: string,
-    defaultMaintanceSchedule: string,
+    defaultMaintanceSchedule: number,
     maintanceRequirements: Array<MaintanceRequirements>,
   ): Promise<DeviceCategorys | string> {
     try {
@@ -103,13 +104,13 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
 
   async getMaintanceScheduleFromParent(
     parentID: string
-  ): Promise<string> {
+  ): Promise<number> {
     try {
       const parent = await this.findById(parentID);
       return parent.defaultMaintanceSchedule;
     } catch (error) {
     if (error.code === 'ENTITY_NOT_FOUND') {
-      return 'Unexpected error: Parent category not found';
+      return -1;
     }
     throw error;
     }
@@ -143,7 +144,8 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
     for(const root of roots) {
       responseArray.push({
         categoryID: root.categoryID,
-        categoryName: root.categoryName
+        categoryName: root.categoryName,
+        defaultMaintanceSchedule: root.defaultMaintanceSchedule
       });
     }
     return responseArray;
@@ -155,9 +157,11 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
     const parent = await this.findById(categoryID);
     const responseArray: Array<object> = [];
     for (const child of parent.childrenIDs) {
+      const currentChild = await this.findById(child);
       responseArray.push({
         categoryID: child,
-        categoryName: (await this.findById(child)).categoryName
+        categoryName: currentChild.categoryName,
+        defaultMaintanceSchedule: currentChild.defaultMaintanceSchedule
       })
     }
     return responseArray;
@@ -232,7 +236,7 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
     parentCategoryID: string,
     whichChildID: string,
     categoryName: string,
-    defaultMaintanceSchedule: string,
+    defaultMaintanceSchedule: number,
     maintanceRequirements: Array<MaintanceRequirements>,
     professionRepo: ProfessionRepository
   ): Promise<DeviceCategorys | string> {

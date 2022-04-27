@@ -27,7 +27,7 @@ const deviceCategorySchema: SchemaObject = {
       type: 'string',
     },
     defaultMaintanceSchedule: {
-      type: 'string',
+      type: 'number',
     },
     maintanceRequirements: {
       type: 'array',
@@ -77,7 +77,7 @@ const deviceCategoryInsertSchema: SchemaObject = {
       type: 'string',
     },
     defaultMaintanceSchedule: {
-      type: 'string',
+      type: 'number',
     },
     maintanceRequirements: {
       type: 'array',
@@ -102,7 +102,7 @@ const deviceCategoryUpdateSchema: SchemaObject = {
       type: 'string',
     },
     defaultMaintanceSchedule: {
-      type: 'string',
+      type: 'number',
     },
     maintanceRequirements: {
       type: 'array',

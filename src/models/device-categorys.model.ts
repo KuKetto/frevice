@@ -65,9 +65,9 @@ export class DeviceCategorys extends Entity {
   categoryName: string;
 
   @property({
-    type: 'string',
+    type: 'number',
   })
-  defaultMaintanceSchedule: string;
+  defaultMaintanceSchedule: number;
 
   @property({
     type: 'array',

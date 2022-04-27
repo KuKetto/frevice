@@ -19,7 +19,7 @@ export class DeviceCategoryController {
     description: 'Add new deviceCategory',
   })
   async createNewCategory(
-    @requestBody(deviceCategoryRequestBody) newDeviceCategory: {'parentCategoryID':string, 'categoryName':string, 'defaultMaintanceSchedule':string, 'maintanceRequirements': Array<MaintanceRequirements>}
+    @requestBody(deviceCategoryRequestBody) newDeviceCategory: {'parentCategoryID':string, 'categoryName':string, 'defaultMaintanceSchedule':number, 'maintanceRequirements': Array<MaintanceRequirements>}
   ): Promise<string> {
     return this.deviceCategorysRepository.newCategory(newDeviceCategory.parentCategoryID, newDeviceCategory.categoryName, newDeviceCategory.defaultMaintanceSchedule, newDeviceCategory.maintanceRequirements, this.professionRepository);
   }
@@ -29,7 +29,7 @@ export class DeviceCategoryController {
     description: 'Update deviceCategory data by ID',
   })
   async updateCategory(
-    @requestBody(deviceCategoryUpdateRequestBody) updateCategory: {'categoryName':string, 'defaultMaintanceSchedule':string, 'maintanceRequirements': Array<MaintanceRequirements>},
+    @requestBody(deviceCategoryUpdateRequestBody) updateCategory: {'categoryName':string, 'defaultMaintanceSchedule':number, 'maintanceRequirements': Array<MaintanceRequirements>},
     @param.path.string('categoryID') categoryID: typeof DeviceCategorys.prototype.categoryID
   ): Promise<DeviceCategorys | string> {
     return this.deviceCategorysRepository.updadeCategory(categoryID, updateCategory.categoryName, updateCategory.defaultMaintanceSchedule, updateCategory.maintanceRequirements);
@@ -58,7 +58,7 @@ export class DeviceCategoryController {
     description: 'Insert category inside a tree',
   })
   async insertIntoTree(
-    @requestBody(deviceCategoryInsertRequestBody) newDeviceCategory: {'whichChildID':string, 'categoryName':string, 'defaultMaintanceSchedule':string, 'maintanceRequirements': Array<MaintanceRequirements>},
+    @requestBody(deviceCategoryInsertRequestBody) newDeviceCategory: {'whichChildID':string, 'categoryName':string, 'defaultMaintanceSchedule':number, 'maintanceRequirements': Array<MaintanceRequirements>},
     @param.path.string('parentCategoryID') parentCategoryID: typeof DeviceCategorys.prototype.categoryID
   ): Promise<DeviceCategorys | string> {
     return this.deviceCategorysRepository.insertIntoTree(parentCategoryID, newDeviceCategory.whichChildID,newDeviceCategory.categoryName, newDeviceCategory.defaultMaintanceSchedule, newDeviceCategory.maintanceRequirements, this.professionRepository);
@@ -82,7 +82,7 @@ export class DeviceCategoryController {
     @requestBody(testGenRequestBody) testGen: {'n':number, 'parentID': string}
  ): Promise<void> {
     let i = 0;
-    await this.deviceCategorysRepository.newCategory(testGen.parentID, `${i}`, 'testSchedule', [], this.professionRepository);
+    await this.deviceCategorysRepository.newCategory(testGen.parentID, `${i}`, 1, [], this.professionRepository);
     i++;
     for (i; i<testGen.n; i++) {
       const treeBuildingOrRootChance = Math.floor(Math.random() * ((100) - 0 + 1) + 0);
@@ -92,9 +92,9 @@ export class DeviceCategoryController {
           categoryName: `${randomNum}`
         }});
         if (getRandomParent?.categoryID === undefined) return;
-        await this.deviceCategorysRepository.newCategory(getRandomParent?.categoryID, `${i}`, 'testSchedule', [], this.professionRepository);
+        await this.deviceCategorysRepository.newCategory(getRandomParent?.categoryID, `${i}`, 1, [], this.professionRepository);
       } else {
-        await this.deviceCategorysRepository.newCategory(testGen.parentID, `${i}`, 'testSchedule', [], this.professionRepository);
+        await this.deviceCategorysRepository.newCategory(testGen.parentID, `${i}`, 1, [], this.professionRepository);
       }
     }
   }
