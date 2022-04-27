@@ -3,6 +3,7 @@ import {DefaultCrudRepository} from '@loopback/repository';
 import {MongoDbDataSource} from '../datasources';
 import {RegisterOnHold, RegisterOnHoldRelations} from '../models';
 import {genID} from '../services/id-gen';
+import {genSalt} from '../services/salt_gen';
 
 export class RegisterOnHoldRepository extends DefaultCrudRepository<
   RegisterOnHold,
@@ -20,9 +21,10 @@ export class RegisterOnHoldRepository extends DefaultCrudRepository<
     employeeName: string,
     role: string,
     salary: number,
+    phone: number,
     professions: Array<string>,
-  ): Promise<number> {
-    const code = Math.floor(Math.random() * ((999999) - 100000 + 1) + 100000);
+  ): Promise<string> {
+    const code = genSalt();
     await this.create({
       employeeID: await this.genRID(),
       email: email,
@@ -30,21 +32,18 @@ export class RegisterOnHoldRepository extends DefaultCrudRepository<
       role: role,
       salary: salary,
       verificationCode: code,
+      phone: phone,
       professions: professions
     });
     return code;
   }
 
   async verification(
-    email: string,
-    verificationCode: number,
-  ): Promise<string | RegisterOnHold> {
-    const record = await this.findOne({where: {
-      email: email
+    verificationCode: string,
+  ): Promise<null | RegisterOnHold> {
+    return this.findOne({where: {
+      verificationCode: verificationCode
     }});
-    if (record === null) return "Hiba: nincs folyamatban lévő regisztráció a megadott e-mail címmel!";
-    if (record?.verificationCode !== verificationCode) return "Hiba: nem megfelelő megerősítési kód!";
-    return record;
   }
 
   async genRID(): Promise<string> {

@@ -2,7 +2,7 @@ import {SchemaObject} from '@loopback/rest';
 
 const recordNewEmployeeSchema: SchemaObject = {
   type: 'object',
-  required: ['email', 'employeeName', 'role', 'salary', 'professions'],
+  required: ['email', 'employeeName', 'role', 'salary', 'phone', 'professions'],
   properties: {
     email: {
       type: 'string',
@@ -14,6 +14,9 @@ const recordNewEmployeeSchema: SchemaObject = {
       type: 'string',
     },
     salary: {
+      type: 'number'
+    },
+    phone: {
       type: 'number'
     },
     professions: {
@@ -35,7 +38,7 @@ export const recordNewEmployeeRequestBody = {
 
 const registerEmployeeSchema: SchemaObject = {
   type: 'object',
-  required: ['email', 'username', 'password', 'verificationCode'],
+  required: ['email', 'username', 'password'],
   properties: {
     email: {
       type: 'string',
@@ -45,9 +48,6 @@ const registerEmployeeSchema: SchemaObject = {
     },
     password: {
       type: 'string',
-    },
-    verificationCode: {
-      type: 'number',
     },
   },
 };

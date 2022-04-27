@@ -31,9 +31,9 @@ export class RegisterOnHold extends Entity {
   salary: number;
 
   @property({
-    type: 'number',
+    type: 'string',
   })
-  verificationCode: number;
+  verificationCode: string;
 
   @property({
     type: 'array',
@@ -41,9 +41,10 @@ export class RegisterOnHold extends Entity {
   })
   professions: string[];
 
-  "Email": {
-    datasource: "GmailDataSource"
-  }
+  @property({
+    type: 'number',
+  })
+  phone: number;
 
   constructor(data?: Partial<RegisterOnHold>) {
     super(data);

@@ -23,7 +23,8 @@ export class UserDataRepository extends DefaultCrudRepository<
     employeeID: string,
     employeeName: string,
     professionKnownIDs: Array<string>,
-    salary: number
+    salary: number,
+    phone: number
   ): Promise<UserData> {
     return this.create({
       username: username,
@@ -35,7 +36,8 @@ export class UserDataRepository extends DefaultCrudRepository<
         employeeID: employeeID,
         employeeName: employeeName,
         professionKnownIDs: professionKnownIDs,
-        salary: salary
+        salary: salary,
+        phone: phone
       }
     });
   }

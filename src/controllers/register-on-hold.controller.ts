@@ -2,7 +2,7 @@ import {UserRepository} from '@loopback/authentication-jwt';
 import {
   repository
 } from '@loopback/repository';
-import {post, put, requestBody, response} from '@loopback/rest';
+import {param, patch, post, requestBody, response} from '@loopback/rest';
 import {hash} from 'bcryptjs';
 import _ from 'lodash';
 import {UserData} from '../models/user-data.model';
@@ -22,20 +22,32 @@ export class RegisterOnHoldController {
     description: 'Register',
   })
   async recordNewEmployee(
-    @requestBody(recordNewEmployeeRequestBody) employee: {'email': string, 'employeeName': string, 'role': string, 'salary': number, 'professions': Array<string>},
-  ): Promise<number> {
-    return this.registerOnHoldRepository.recordNewEmployee(employee.email, employee.employeeName, employee.role, employee.salary, employee.professions);
+    @requestBody(recordNewEmployeeRequestBody) employee: {'email': string, 'employeeName': string, 'role': string, 'salary': number, 'phone': number, 'professions': Array<string>},
+  ): Promise<string> {
+    const code = await this.registerOnHoldRepository.recordNewEmployee(employee.email, employee.employeeName, employee.role, employee.salary, employee.phone, employee.professions);
+    return `/employee/$${code}`
   }
 
-  @put('/employee')
+  @patch('/employee/register/${token}')
+  @response(200, {
+    description: 'Register',
+  })
+  async checkToken(
+    @param.path.string('token') token: string
+  ): Promise<boolean> {
+    return await this.registerOnHoldRepository.verification(token) === null ? true : false;
+  }
+
+  @post('/employee/register/${token}')
   @response(200, {
     description: 'Register',
   })
   async register(
-    @requestBody(registerEmployeeRequestBody) employee: {'email': string, 'username': string, 'password': string, 'verificationCode': number},
+    @requestBody(registerEmployeeRequestBody) employee: {'email': string, 'username': string, 'password': string},
+    @param.path.string('token') token: string
   ): Promise<string | UserData> {
-    const verification = await this.registerOnHoldRepository.verification(employee.email, employee.verificationCode);
-    if (typeof verification === "string") return verification;
+    const verification = await this.registerOnHoldRepository.verification(token);
+    if (verification === null) return "TokenAuth error";
     const uniqueUsernameTest = await this.userDataRepository.usernameUniqueTest(employee.username);
     if (uniqueUsernameTest !== null) return 'This username is already in use';
     const newSalt = genSalt();
@@ -45,6 +57,6 @@ export class RegisterOnHoldController {
     );
     await this.userRepository.userCredentials(savedUser.id).create({password});
     await this.registerOnHoldRepository.deleteById(verification.employeeID);
-    return this.userDataRepository.recordNewRegistration(employee.username, savedUser.id, employee.email, verification.role, newSalt, verification.employeeID, verification.employeeName, verification.professions, verification.salary)
+    return this.userDataRepository.recordNewRegistration(employee.username, savedUser.id, employee.email, verification.role, newSalt, verification.employeeID, verification.employeeName, verification.professions, verification.salary, verification.phone)
   }
 }

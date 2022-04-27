@@ -26,6 +26,11 @@ export class EmployeeData extends Entity {
   })
   salary: number;
 
+  @property({
+    type: 'number',
+  })
+  phone: number;
+
   constructor(data?: Partial<EmployeeData>) {
     super(data);
   }
