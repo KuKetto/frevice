@@ -60,6 +60,52 @@ export class UserDataRepository extends DefaultCrudRepository<
     )
   }
 
+  async addProfession(
+    employeeID: string,
+    professionID: string
+  ): Promise<string> {
+    const employee = await this.findOne({where: {
+      employeeData: {
+        regexp: employeeID
+      }
+    }});
+    if (employee === null) return "Unexcepted error: not found employee by id";
+    employee.employeeData.professionKnownIDs.push(professionID);
+    return "success";
+  }
+
+  async removeProfession(
+    employeeID: string,
+    professionID: string
+  ): Promise<string> {
+    const employee = await this.findOne({where: {
+      employeeData: {
+        regexp: employeeID
+      }
+    }});
+    if (employee === null) return "Unexcepted error: not found employee by id";
+    employee.employeeData.professionKnownIDs.splice(employee.employeeData.professionKnownIDs.indexOf(professionID), 1);
+    return "success";
+  }
+
+  async getEmployeesByProfession(
+    professionID: string
+  ): Promise<Array<object>> {
+    const responseArray = [];
+    const employees = await this.find({where: {
+      employeeData: {
+        regexp: professionID
+      }
+    }});
+    for (const employee of employees) {
+      responseArray.push({
+        employeeName: employee.employeeData.employeeName,
+        employeeID: employee.employeeData.employeeID
+      })
+    }
+    return responseArray;
+  }
+
   async getMail(
     username: string
   ): Promise<UserData | null> {

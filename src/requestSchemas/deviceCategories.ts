@@ -29,6 +29,9 @@ const deviceCategorySchema: SchemaObject = {
     defaultMaintanceSchedule: {
       type: 'number',
     },
+    expectedMaintanceTimeInMinutes: {
+      type: 'number'
+    },
     maintanceRequirements: {
       type: 'array',
       items: maintanceReqSchema
@@ -79,6 +82,9 @@ const deviceCategoryInsertSchema: SchemaObject = {
     defaultMaintanceSchedule: {
       type: 'number',
     },
+    expectedMaintanceTimeInMinutes: {
+      type: 'number',
+    },
     maintanceRequirements: {
       type: 'array',
       items: maintanceReqSchema
@@ -103,6 +109,9 @@ const deviceCategoryUpdateSchema: SchemaObject = {
     },
     defaultMaintanceSchedule: {
       type: 'number',
+    },
+    expectedMaintanceTimeInMinutes: {
+      type: 'number'
     },
     maintanceRequirements: {
       type: 'array',

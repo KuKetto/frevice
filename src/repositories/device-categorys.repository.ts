@@ -20,20 +20,28 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
     parentCategoryID: string,
     categoryName: string,
     defaultMaintanceSchedule: number,
+    expectedMaintanceTimeInMinutes: number,
     maintanceRequirements: Array<MaintanceRequirements>,
     professionRepo: ProfessionRepository
   ): Promise<string> {
     let maintanceSchedule = defaultMaintanceSchedule;
+    let maintanceTimeInMinutes = expectedMaintanceTimeInMinutes;
     if (maintanceSchedule === undefined) {
       if (parentCategoryID === undefined) return 'Error: defaultMaintanceSchedule was given and cannot fetch it from undefined parentID';
-      else maintanceSchedule = await this.getMaintanceScheduleFromParent(parentCategoryID);
+      else {maintanceSchedule = await this.getMaintanceScheduleFromParent(parentCategoryID);}
       if (maintanceSchedule === -1) return 'Unexpected error: parent category not found'
+    }
+    if (maintanceTimeInMinutes === undefined) {
+      if (parentCategoryID === undefined) return 'Error: expectedMaintanceTimeInMinutes was given and cannot fetch it from undefined parentID';
+      else {maintanceTimeInMinutes = await this.getExpectedMaintanceTimeInMinutesFromParent(parentCategoryID);}
+      if (maintanceTimeInMinutes === -1) return 'Unexpected error: parent category not found'
     }
     const newCategory = await this.create(new DeviceCategorys({
       categoryID: await this.genCID(),
       parentID: parentCategoryID,
       categoryName: categoryName,
       defaultMaintanceSchedule: maintanceSchedule,
+      expectedMaintanceTimeInMinutes: maintanceTimeInMinutes,
       maintanceRequirements: maintanceRequirements
     }));
     if (newCategory.parentID !== undefined) {
@@ -85,12 +93,14 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
     categoryID: string,
     categoryName: string,
     defaultMaintanceSchedule: number,
+    expectedMaintanceTimeInMinutes: number,
     maintanceRequirements: Array<MaintanceRequirements>,
   ): Promise<DeviceCategorys | string> {
     try {
       const category = await this.findById(categoryID);
       if (categoryName !== undefined) category.categoryName = categoryName;
       if (defaultMaintanceSchedule !== undefined) category.defaultMaintanceSchedule = defaultMaintanceSchedule;
+      if (expectedMaintanceTimeInMinutes !== undefined) category.expectedMaintanceTimeInMinutes = expectedMaintanceTimeInMinutes;
       if (maintanceRequirements !== undefined) category.maintanceRequirements = maintanceRequirements;
       await this.replaceById(categoryID, category);
       return category;
@@ -116,6 +126,20 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
     }
   }
 
+  async getExpectedMaintanceTimeInMinutesFromParent(
+    parentID: string
+  ): Promise<number> {
+    try {
+      const parent = await this.findById(parentID);
+      return parent.expectedMaintanceTimeInMinutes;
+    } catch (error) {
+    if (error.code === 'ENTITY_NOT_FOUND') {
+      return -1;
+    }
+    throw error;
+    }
+  }
+
   async getByID(
     categoryID: string
   ): Promise<object> {
@@ -124,6 +148,7 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
       return {
         categoryName: category.categoryName,
         defaultMaintanceSchedule: category.defaultMaintanceSchedule,
+        expectedMaintanceTimeInMinutes: category.expectedMaintanceTimeInMinutes,
         maintanceRequirements: category.maintanceRequirements
       }
     } catch (error) {
@@ -145,7 +170,8 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
       responseArray.push({
         categoryID: root.categoryID,
         categoryName: root.categoryName,
-        defaultMaintanceSchedule: root.defaultMaintanceSchedule
+        defaultMaintanceSchedule: root.defaultMaintanceSchedule,
+        expectedMaintanceTimeInMinutes: root.expectedMaintanceTimeInMinutes
       });
     }
     return responseArray;
@@ -161,7 +187,8 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
       responseArray.push({
         categoryID: child,
         categoryName: currentChild.categoryName,
-        defaultMaintanceSchedule: currentChild.defaultMaintanceSchedule
+        defaultMaintanceSchedule: currentChild.defaultMaintanceSchedule,
+        expectedMaintanceTimeInMinutes: currentChild.expectedMaintanceTimeInMinutes
       })
     }
     return responseArray;
@@ -237,6 +264,7 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
     whichChildID: string,
     categoryName: string,
     defaultMaintanceSchedule: number,
+    expectedMaintanceTimeInMinutes: number,
     maintanceRequirements: Array<MaintanceRequirements>,
     professionRepo: ProfessionRepository
   ): Promise<DeviceCategorys | string> {
@@ -254,6 +282,7 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
         childrenIDs: newCategoryChildrenArray,
         categoryName: categoryName,
         defaultMaintanceSchedule: defaultMaintanceSchedule,
+        expectedMaintanceTimeInMinutes: expectedMaintanceTimeInMinutes,
         maintanceRequirements: maintanceRequirements
       }));
       parent.childrenIDs[parent.childrenIDs.indexOf(whichChildID)] = newCategory.categoryID;
@@ -297,7 +326,8 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
               childrenIDs: child.childrenIDs,
               descendantsIDs: child.descendantsIDs,
               maintanceRequirements: child.maintanceRequirements,
-              defaultMaintanceSchedule: child.defaultMaintanceSchedule
+              defaultMaintanceSchedule: child.defaultMaintanceSchedule,
+              expectedMaintanceTimeInMinutes: child.expectedMaintanceTimeInMinutes
             });
           } catch (error) {
           if (error.code === 'ENTITY_NOT_FOUND') {

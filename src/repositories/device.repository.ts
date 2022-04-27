@@ -25,8 +25,9 @@ export class DeviceRepository extends DefaultCrudRepository<
   description: string,
   categoryRepo: DeviceCategorysRepository
   ): Promise<Device> {
-    const currentDate = Date.now();
+    const currentDate = new Date();
     const maintanceSchedule = (await categoryRepo.findById(categoryID)).defaultMaintanceSchedule;
+    const nextDate = new Date(currentDate.getDate() + maintanceSchedule);
     return this.create({
       deviceID: await this.genDID(),
       deviceName: deviceName,
@@ -36,7 +37,7 @@ export class DeviceRepository extends DefaultCrudRepository<
       location: location,
       description: description,
       lastMaintance: currentDate,
-      nextMaintance: currentDate + 86400 * maintanceSchedule
+      nextMaintance: nextDate
     })
   }
 
@@ -128,7 +129,9 @@ export class DeviceRepository extends DefaultCrudRepository<
         professions: professions,
         productID: device.productID,
         location: device.location,
-        description: device.description
+        description: device.description,
+        lastMaintance: device.lastMaintance,
+        nextMaintance: device.nextMaintance
       }
     } catch (error) {
       if (error.code === 'ENTITY_NOT_FOUND') {

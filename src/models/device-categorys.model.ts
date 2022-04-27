@@ -70,6 +70,11 @@ export class DeviceCategorys extends Entity {
   defaultMaintanceSchedule: number;
 
   @property({
+    type: 'number',
+  })
+  expectedMaintanceTimeInMinutes: number;
+
+  @property({
     type: 'array',
     itemType: 'object',
   })
