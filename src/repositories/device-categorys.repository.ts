@@ -133,6 +133,36 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
     }
   }
 
+  async getRoots(): Promise<Array<object>> {
+    const roots = await this.find({where: {
+      ancestorIDs: {
+        exists: false
+      }
+    }});
+    const responseArray: Array<object> = [];
+    for(const root of roots) {
+      responseArray.push({
+        categoryID: root.categoryID,
+        categoryName: root.categoryName
+      });
+    }
+    return responseArray;
+  }
+
+  async getChildOfParent(
+    categoryID: typeof DeviceCategorys.prototype.categoryID
+  ): Promise<Array<object>> {
+    const parent = await this.findById(categoryID);
+    const responseArray: Array<object> = [];
+    for (const child of parent.childrenIDs) {
+      responseArray.push({
+        categoryID: child,
+        categoryName: (await this.findById(child)).categoryName
+      })
+    }
+    return responseArray;
+  }
+
   async getHierarchyTree(): Promise<Array<object>> {
     const roots = await this.find({where: {
       ancestorIDs: {

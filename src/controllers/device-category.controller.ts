@@ -85,12 +85,17 @@ export class DeviceCategoryController {
     await this.deviceCategorysRepository.newCategory(testGen.parentID, `${i}`, 'testSchedule', [], this.professionRepository);
     i++;
     for (i; i<testGen.n; i++) {
-      const randomNum = Math.floor(Math.random() * ((i-1) - 0 + 1) + 0);
-      const getRandomParent = await this.deviceCategorysRepository.findOne({where: {
-        categoryName: `${randomNum}`
-      }});
-      if (getRandomParent?.categoryID === undefined) return;
-      await this.deviceCategorysRepository.newCategory(getRandomParent?.categoryID, `${i}`, 'testSchedule', [], this.professionRepository);
+      const treeBuildingOrRootChance = Math.floor(Math.random() * ((100) - 0 + 1) + 0);
+      if (treeBuildingOrRootChance < 75) {
+        const randomNum = Math.floor(Math.random() * ((i-1) - 0 + 1) + 0);
+        const getRandomParent = await this.deviceCategorysRepository.findOne({where: {
+          categoryName: `${randomNum}`
+        }});
+        if (getRandomParent?.categoryID === undefined) return;
+        await this.deviceCategorysRepository.newCategory(getRandomParent?.categoryID, `${i}`, 'testSchedule', [], this.professionRepository);
+      } else {
+        await this.deviceCategorysRepository.newCategory(testGen.parentID, `${i}`, 'testSchedule', [], this.professionRepository);
+      }
     }
   }
 
@@ -101,5 +106,23 @@ export class DeviceCategoryController {
   async deleteTestData(): Promise<void> {
     await this.deviceCategorysRepository.deleteAll();
     return;
+  }
+
+  @get('/device-categories/tree')
+  @response(200, {
+    description: 'Get roots',
+  })
+  async getRoots(): Promise<Array<object>> {
+    return this.deviceCategorysRepository.getRoots();
+  }
+
+  @get('/device-categories/tree/${categoryID}')
+  @response(200, {
+    description: 'Get child of parents',
+  })
+  async getChildOfParents(
+    @param.path.string('categoryID') categoryID: typeof DeviceCategorys.prototype.categoryID
+  ): Promise<Array<object>> {
+    return this.deviceCategorysRepository.getChildOfParent(categoryID);
   }
 }
