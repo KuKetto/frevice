@@ -29,7 +29,7 @@ export class UserController {
     @inject(SecurityBindings.USER, {optional: true})
     public user: UserProfile,
     @repository(UserRepository) protected userRepository: UserRepository,
-    @repository(UserDataRepository) public userDataRepository: UserDataRepository,
+    @repository(UserDataRepository) public userDataRepository: UserDataRepository
   ) {}
 
   @post('/users/login')
@@ -64,7 +64,6 @@ export class UserController {
     await this.userDataRepository.contructOnNewRegister(savedUser.username, savedUser.id, savedUser.email, register.role, newSalt);
     return savedUser;
   }
-
 
   async getUserFromRequestBodyParams(
     email: string,

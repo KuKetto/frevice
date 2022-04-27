@@ -14,6 +14,32 @@ export class UserDataRepository extends DefaultCrudRepository<
     super(UserData, dataSource);
   }
 
+  async recordNewRegistration(
+    username: string,
+    userID: string,
+    email: string,
+    role: string,
+    userSalt: string,
+    employeeID: string,
+    employeeName: string,
+    professionKnownIDs: Array<string>,
+    salary: number
+  ): Promise<UserData> {
+    return this.create({
+      username: username,
+      userID: userID,
+      email: email,
+      role: role,
+      salt: userSalt,
+      employeeData: {
+        employeeID: employeeID,
+        employeeName: employeeName,
+        professionKnownIDs: professionKnownIDs,
+        salary: salary
+      }
+    });
+  }
+
   async contructOnNewRegister(
     username: string | undefined,
     userID: string,

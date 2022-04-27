@@ -1,6 +1,37 @@
 import {Entity, model, property} from '@loopback/repository';
 
 @model()
+export class EmployeeData extends Entity {
+  @property({
+    type: 'string',
+    id: true,
+    generated: false,
+    required: true,
+  })
+  employeeID: string;
+
+  @property({
+    type: 'string',
+  })
+  employeeName: string;
+
+  @property({
+    type: 'array',
+    itemType: 'string',
+  })
+  professionKnownIDs: string[];
+
+  @property({
+    type: 'number',
+  })
+  salary: number;
+
+  constructor(data?: Partial<EmployeeData>) {
+    super(data);
+  }
+}
+
+@model()
 export class UserData extends Entity {
   @property({
     type: 'string',
@@ -28,6 +59,11 @@ export class UserData extends Entity {
     type: 'string',
   })
   role: string;
+
+  @property({
+    type: 'object',
+  })
+  employeeData: EmployeeData;
 
   constructor(data?: Partial<UserData>) {
     super(data);

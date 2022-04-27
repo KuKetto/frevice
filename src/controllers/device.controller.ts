@@ -32,7 +32,7 @@ export class DeviceController {
   async create(
     @requestBody(createDeviceRequestBody) newDevice: {'deviceName':string, 'categoryID':string, 'productID':string, 'location':string, 'description':string}
   ): Promise<Device> {
-    return this.deviceRepository.createNewDevice(newDevice.deviceName, newDevice.categoryID, this.professionRepository, newDevice.productID, newDevice.location, newDevice.description);
+    return this.deviceRepository.createNewDevice(newDevice.deviceName, newDevice.categoryID, this.professionRepository, newDevice.productID, newDevice.location, newDevice.description, this.deviceCategorysRepository);
   }
 
   @patch('/devices/${deviceID}')

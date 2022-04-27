@@ -42,14 +42,14 @@ export class Device extends Entity {
   description: string;
 
   @property({
-    type: 'string',
+    type: 'number',
   })
-  lastMaintance: string;
+  lastMaintance: number;
 
   @property({
-    type: 'string',
+    type: 'number',
   })
-  nextMaintance: string;
+  nextMaintance: number;
 
 
   constructor(data?: Partial<Device>) {

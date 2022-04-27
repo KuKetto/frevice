@@ -23,7 +23,10 @@ export class DeviceRepository extends DefaultCrudRepository<
   productID: string,
   location: string,
   description: string,
+  categoryRepo: DeviceCategorysRepository
   ): Promise<Device> {
+    const currentDate = Date.now();
+    const maintanceSchedule = (await categoryRepo.findById(categoryID)).defaultMaintanceSchedule;
     return this.create({
       deviceID: await this.genDID(),
       deviceName: deviceName,
@@ -31,7 +34,9 @@ export class DeviceRepository extends DefaultCrudRepository<
       professionIDs: await this.fetchProfessionIDsFromCategoryID(categoryID, professionRepo),
       productID: productID,
       location: location,
-      description: description
+      description: description,
+      lastMaintance: currentDate,
+      nextMaintance: currentDate + 86400 * maintanceSchedule
     })
   }
 
