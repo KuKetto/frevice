@@ -44,13 +44,14 @@ export class TaskRepository extends DefaultCrudRepository<
     type: string,
     date: number
   ): Promise<Task> {
+    const newdate = new Date(date*1000);
     return this.create({
       taskID: await this.genTID(),
       employeeID: employeeID,
       status: "To do",
       deviceID: deviceID,
       type: type,
-      date: date
+      date: newdate
     })
   }
 
@@ -116,10 +117,12 @@ export class TaskRepository extends DefaultCrudRepository<
     const device = await deviceRepo.findById((await this.findById(taskID)).deviceID);
     const currentDate = new Date();
     const maintanceSchedule = (await categoryRepo.findById(device.categoryID)).defaultMaintanceSchedule;
-    const nextDate = new Date(currentDate.getDate() + maintanceSchedule);
+    const nextDate = new Date();
+    nextDate.setDate(nextDate.getDate() + maintanceSchedule);
     device.lastMaintance = currentDate;
     device.nextMaintance = nextDate;
     await deviceRepo.replaceById(device.deviceID, device);
+    await this.deleteById(taskID);
     return "success";
   }
 

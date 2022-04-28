@@ -31,7 +31,7 @@ const changeStatusSchema: SchemaObject = {
   type: 'object',
   required: ['taskID', 'status'],
   properties: {
-    employeeID: {
+    taskID: {
       type: 'string',
     },
     status: {

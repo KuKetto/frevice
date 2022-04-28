@@ -1,5 +1,5 @@
 import {inject} from '@loopback/core';
-import {DefaultCrudRepository, WhereBuilder} from '@loopback/repository';
+import {DefaultCrudRepository} from '@loopback/repository';
 import {ProfessionRepository} from '.';
 import {MongoDbDataSource} from '../datasources';
 import {DeviceCategorys, DeviceCategorysRelations, MaintanceRequirements} from '../models';
@@ -46,11 +46,11 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
     }));
     if (newCategory.parentID !== undefined) {
       try {
-        const whereBuilder = new WhereBuilder();
-        const ancestorsOfParentFilter = whereBuilder
-        .inq(parentCategoryID, DeviceCategorys.prototype.descendantsIDs)
-        .build()
-        const arrayOfAncestorsOfParent = await this.find({where: ancestorsOfParentFilter});
+        const arrayOfAncestorsOfParent = await this.find({where: {
+          descendantsIDs: {
+            regexp: parentCategoryID
+          }
+        }});
         for(const ancestor of arrayOfAncestorsOfParent) {
           ancestor.descendantsIDs.push(newCategory.categoryID);
           await this.replaceById(ancestor.categoryID, ancestor);
