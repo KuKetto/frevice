@@ -42,7 +42,7 @@ export class TaskRepository extends DefaultCrudRepository<
     employeeID: string,
     deviceID: string,
     type: string,
-    date: Date
+    date: number
   ): Promise<Task> {
     return this.create({
       taskID: await this.genTID(),
@@ -75,12 +75,12 @@ export class TaskRepository extends DefaultCrudRepository<
   }
 
   async employeesWorkable(
-    taskID: string,
+    deviceID: string,
     userRepo: UserDataRepository,
     deviceRepo: DeviceRepository
   ): Promise<Array<object>> {
     const responseArray = [];
-    const taskProfessions = (await deviceRepo.findById((await this.findById(taskID)).deviceID)).professionIDs;
+    const taskProfessions = (await deviceRepo.findById(deviceID)).professionIDs;
     const employees = await userRepo.find();
     for (const employee of employees) {
       if (taskProfessions.every(id => employee.employeeData.professionKnownIDs.includes(id))) {
@@ -95,8 +95,8 @@ export class TaskRepository extends DefaultCrudRepository<
   }
 
   async changeStatus(
-    status: string,
     taskID: string,
+    status: string,
     deviceRepo: DeviceRepository,
     categoryRepo: DeviceCategorysRepository
   ): Promise<string> {

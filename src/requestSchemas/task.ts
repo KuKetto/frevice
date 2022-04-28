@@ -3,8 +3,8 @@ import {SchemaObject} from '@loopback/rest';
 const createTaskSchema: SchemaObject = {
   type: 'object',
   required: ['employeeID', 'deviceID', 'type', 'date'],
-  employeeID: {
-    email: {
+  properties: {
+    employeeID: {
       type: 'string',
     },
     deviceID: {
@@ -14,7 +14,7 @@ const createTaskSchema: SchemaObject = {
       type: 'string',
     },
     date: {
-      type: 'date',
+      type: 'number',
     },
   },
 };
@@ -29,9 +29,9 @@ export const createTaskRequestBody = {
 
 const changeStatusSchema: SchemaObject = {
   type: 'object',
-  required: ['employeeID', 'status'],
-  employeeID: {
-    email: {
+  required: ['taskID', 'status'],
+  properties: {
+    employeeID: {
       type: 'string',
     },
     status: {

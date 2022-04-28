@@ -27,7 +27,8 @@ export class DeviceRepository extends DefaultCrudRepository<
   ): Promise<Device> {
     const currentDate = new Date();
     const maintanceSchedule = (await categoryRepo.findById(categoryID)).defaultMaintanceSchedule;
-    const nextDate = new Date(currentDate.getDate() + maintanceSchedule);
+    const nextDate = new Date();
+    nextDate.setDate(nextDate.getDate() + maintanceSchedule);
     return this.create({
       deviceID: await this.genDID(),
       deviceName: deviceName,

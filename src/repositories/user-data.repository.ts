@@ -24,7 +24,7 @@ export class UserDataRepository extends DefaultCrudRepository<
     employeeName: string,
     professionKnownIDs: Array<string>,
     salary: number,
-    phone: number
+    phone: string
   ): Promise<UserData> {
     return this.create({
       username: username,

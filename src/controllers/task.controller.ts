@@ -22,14 +22,14 @@ export class TaskController {
     return this.taskRepository.getTaskList(this.deviceRepository, this.deviceCategorysRepository);
   }
 
-  @get('/tasks/${taskID}/employees')
+  @get('/tasks/${deviceID}/employees')
   @response(200, {
     description: 'List all employees with required professions'
   })
   async employeesWorkable(
-    @param.path.string('taskID') taskID: string
+    @param.path.string('deviceID') deviceID: string
   ): Promise<Array<object>> {
-    return this.taskRepository.employeesWorkable(taskID, this.userDataRepository, this.deviceRepository);
+    return this.taskRepository.employeesWorkable(deviceID, this.userDataRepository, this.deviceRepository);
   }
 
   @get('/tasks/${employeeID}')
@@ -47,7 +47,7 @@ export class TaskController {
     description: 'Create new task'
   })
   async createTask(
-    @requestBody(createTaskRequestBody) newTask: {'employeeID': string, 'deviceID': string, 'type': string, 'date': Date}
+    @requestBody(createTaskRequestBody) newTask: {'employeeID': string, 'deviceID': string, 'type': string, 'date': number}
   ): Promise<Task> {
     return this.taskRepository.createTask(newTask.employeeID, newTask.deviceID, newTask.type, newTask.date);
   }
@@ -57,8 +57,8 @@ export class TaskController {
     description: 'Change status of task'
   })
   async changeStatus(
-    @requestBody(changeStatusRequestBody) newStatus: {'employeeID': string, 'status': string}
+    @requestBody(changeStatusRequestBody) newStatus: {'taskID': string, 'status': string}
   ): Promise<string> {
-    return this.taskRepository.changeStatus(newStatus.employeeID, newStatus.status, this.deviceRepository, this.deviceCategorysRepository);
+    return this.taskRepository.changeStatus(newStatus.taskID, newStatus.status, this.deviceRepository, this.deviceCategorysRepository);
   }
 }

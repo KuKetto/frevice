@@ -21,7 +21,7 @@ export class RegisterOnHoldRepository extends DefaultCrudRepository<
     employeeName: string,
     role: string,
     salary: number,
-    phone: number,
+    phone: string,
     professions: Array<string>,
   ): Promise<string> {
     const code = genSalt();

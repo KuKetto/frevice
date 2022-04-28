@@ -22,7 +22,7 @@ export class RegisterOnHoldController {
     description: 'Register',
   })
   async recordNewEmployee(
-    @requestBody(recordNewEmployeeRequestBody) employee: {'email': string, 'employeeName': string, 'role': string, 'salary': number, 'phone': number, 'professions': Array<string>},
+    @requestBody(recordNewEmployeeRequestBody) employee: {'email': string, 'employeeName': string, 'role': string, 'salary': number, 'phone': string, 'professions': Array<string>},
   ): Promise<string> {
     const code = await this.registerOnHoldRepository.recordNewEmployee(employee.email, employee.employeeName, employee.role, employee.salary, employee.phone, employee.professions);
     return `/employee/$${code}`
@@ -35,7 +35,7 @@ export class RegisterOnHoldController {
   async checkToken(
     @param.path.string('token') token: string
   ): Promise<boolean> {
-    return await this.registerOnHoldRepository.verification(token) === null ? true : false;
+    return await this.registerOnHoldRepository.verification(token) === null ? false : true;
   }
 
   @post('/employee/register/${token}')

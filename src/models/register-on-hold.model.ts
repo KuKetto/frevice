@@ -42,9 +42,9 @@ export class RegisterOnHold extends Entity {
   professions: string[];
 
   @property({
-    type: 'number',
+    type: 'string',
   })
-  phone: number;
+  phone: string;
 
   constructor(data?: Partial<RegisterOnHold>) {
     super(data);

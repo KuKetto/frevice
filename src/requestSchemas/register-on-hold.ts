@@ -17,7 +17,7 @@ const recordNewEmployeeSchema: SchemaObject = {
       type: 'number'
     },
     phone: {
-      type: 'number'
+      type: 'string'
     },
     professions: {
       type: 'array',
