@@ -7,15 +7,17 @@ import {param, patch, post, requestBody, response} from '@loopback/rest';
 import {hash} from 'bcryptjs';
 import _ from 'lodash';
 import {UserData} from '../models/user-data.model';
-import {RegisterOnHoldRepository, UserDataRepository} from '../repositories';
+import {ProfessionRepository, RegisterOnHoldRepository, UserDataRepository} from '../repositories';
 import {recordNewEmployeeRequestBody, registerEmployeeRequestBody} from '../requestSchemas/register-on-hold';
+import {mailToken} from '../services/email.service';
 import {genSalt} from '../services/salt_gen';
 
 export class RegisterOnHoldController {
   constructor(
     @repository(RegisterOnHoldRepository) public registerOnHoldRepository : RegisterOnHoldRepository,
     @repository(UserRepository) protected userRepository: UserRepository,
-    @repository(UserDataRepository) public userDataRepository: UserDataRepository
+    @repository(UserDataRepository) public userDataRepository: UserDataRepository,
+    @repository(ProfessionRepository) public professionRepository : ProfessionRepository,
   ) {}
 
   @authenticate('jwt')
@@ -27,6 +29,17 @@ export class RegisterOnHoldController {
     @requestBody(recordNewEmployeeRequestBody) employee: {'email': string, 'employeeName': string, 'role': string, 'salary': number, 'phone': string, 'professions': Array<string>},
   ): Promise<string> {
     const code = await this.registerOnHoldRepository.recordNewEmployee(employee.email, employee.employeeName, employee.role, employee.salary, employee.phone, employee.professions);
+    let roleOrProfessions = "";
+    if (employee.role === "maintanceTechnician") {
+      roleOrProfessions = "Karbantartó, végzettségei: ";
+      for (const profession of employee.professions) {
+        const professionName = await this.professionRepository.findById(profession);
+        roleOrProfessions += `${professionName.professionName}, `
+      }
+    }
+    else if (employee.role === "operator") roleOrProfessions = "Operátor";
+    else if (employee.role === "deviceManager") roleOrProfessions = "Eszközkezelő";
+    await mailToken(code, employee.email, employee.employeeName, employee.salary, employee.phone, roleOrProfessions.substring(0, roleOrProfessions.length - 2));
     return `/employee/$${code}`
   }
 
