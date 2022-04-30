@@ -49,8 +49,14 @@ export class RegisterOnHoldController {
   })
   async checkToken(
     @param.path.string('token') token: string
-  ): Promise<boolean> {
-    return await this.registerOnHoldRepository.verification(token) === null ? false : true;
+  ): Promise<object> {
+    const verification = await this.registerOnHoldRepository.verification(token);
+    return verification === null ? {
+      tokenValid: false
+    } : {
+      tokenValid: true,
+      email: verification.email
+    };
   }
 
   @post('/employee/register/${token}')

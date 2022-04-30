@@ -31,7 +31,7 @@ export class EmployeeController {
 
   @del('/employee/profession')
   @response(200, {
-    description: 'add profession',
+    description: 'del profession',
   })
   async removeProfession(
     @requestBody(professionUpdateRequestBody) employeeProfession: {'employeeID': string, 'professionID': string},
@@ -41,11 +41,20 @@ export class EmployeeController {
 
   @get('/employee/profession/${professionID}')
   @response(200, {
-    description: 'add profession',
+    description: 'get profession',
   })
   async getEmployeesByProfession(
     @param.path.string('professionID') professionID: string
   ): Promise<Array<object>> {
     return this.userDataRepository.getEmployeesByProfession(professionID);
+  }
+
+  @get('/employee')
+  @response(200, {
+    description: 'get employee list',
+  })
+  async getEmployeeList(
+  ): Promise<Array<object>> {
+    return this.userDataRepository.getEmployeeList();
   }
 }

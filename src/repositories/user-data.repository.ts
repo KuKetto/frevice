@@ -126,4 +126,18 @@ export class UserDataRepository extends DefaultCrudRepository<
     }})
     return user?.salt;
   }
+
+  async getEmployeeList(): Promise<Array<object>> {
+    const responseArray = [];
+    const maintanceTechnicians = await this.find({where: {
+      role: 'maintanceTechnician'
+    }});
+    for (const maintanceTechnician of maintanceTechnicians) {
+      responseArray.push({
+        employeeID: maintanceTechnician.employeeData.employeeID,
+        employeeName: maintanceTechnician.employeeData.employeeName
+      });
+    }
+    return responseArray;
+  }
 }
