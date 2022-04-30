@@ -38,12 +38,16 @@ export class UserController {
   })
   async login(
     @requestBody(loginRequestBody) credentials: {'email': string, 'username': string, 'password': string},
-  ): Promise<{token: string} | string> {
+  ): Promise<object | string> {
     const user = await this.getUserFromRequestBodyParams(credentials.email, credentials.username, credentials.password);
     if (typeof user === 'string') return user;
     const userProfile = this.userService.convertToUserProfile(user);
+    const userData = await this.userDataRepository.findOne({where: {email: userProfile.email}});
     const token = await this.jwtService.generateToken(userProfile);
-    return {token};
+    return {
+      token: token,
+      role: userData?.role
+    };
   }
 
   @post('/signup')
