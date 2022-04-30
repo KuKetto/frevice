@@ -44,14 +44,16 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
       expectedMaintanceTimeInMinutes: maintanceTimeInMinutes,
       maintanceRequirements: maintanceRequirements
     }));
-    if (newCategory.parentID !== undefined) {
+    if (newCategory.parentID !== undefined && newCategory.parentID !== '') {
       try {
-        const arrayOfAncestorsOfParent = await this.find({where: {
-          descendantsIDs: {
-            regexp: parentCategoryID
+        const arrayOfAncestorsOfParent = await this.find({
+          where: {
+            descendantsIDs: {
+              regexp: parentCategoryID
+            }
           }
-        }});
-        for(const ancestor of arrayOfAncestorsOfParent) {
+        });
+        for (const ancestor of arrayOfAncestorsOfParent) {
           ancestor.descendantsIDs.push(newCategory.categoryID);
           await this.replaceById(ancestor.categoryID, ancestor);
         }
@@ -76,11 +78,13 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
       await this.replaceById(newCategory.categoryID, newCategory);
 
 
-      const findProfessionsIfExist = await professionRepo.find({where: {
-        categorysKnown: {
-          regexp: parentCategoryID
+      const findProfessionsIfExist = await professionRepo.find({
+        where: {
+          categorysKnown: {
+            regexp: parentCategoryID
+          }
         }
-      }});
+      });
       for (const profession of findProfessionsIfExist) {
         profession.categorysKnown.push(newCategory.categoryID);
         await professionRepo.replaceById(profession.professionID, profession)
@@ -105,10 +109,10 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
       await this.replaceById(categoryID, category);
       return category;
     } catch (error) {
-    if (error.code === 'ENTITY_NOT_FOUND') {
-      return 'Unexpected error: Category not found by ID';
-    }
-    throw error;
+      if (error.code === 'ENTITY_NOT_FOUND') {
+        return 'Unexpected error: Category not found by ID';
+      }
+      throw error;
     }
   }
 
@@ -119,10 +123,10 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
       const parent = await this.findById(parentID);
       return parent.defaultMaintanceSchedule;
     } catch (error) {
-    if (error.code === 'ENTITY_NOT_FOUND') {
-      return -1;
-    }
-    throw error;
+      if (error.code === 'ENTITY_NOT_FOUND') {
+        return -1;
+      }
+      throw error;
     }
   }
 
@@ -133,10 +137,10 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
       const parent = await this.findById(parentID);
       return parent.expectedMaintanceTimeInMinutes;
     } catch (error) {
-    if (error.code === 'ENTITY_NOT_FOUND') {
-      return -1;
-    }
-    throw error;
+      if (error.code === 'ENTITY_NOT_FOUND') {
+        return -1;
+      }
+      throw error;
     }
   }
 
@@ -152,21 +156,23 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
         maintanceRequirements: category.maintanceRequirements
       }
     } catch (error) {
-    if (error.code === 'ENTITY_NOT_FOUND') {
-      return {error: 'Unexpected error: Category not found by ID'};
-    }
-    throw error;
+      if (error.code === 'ENTITY_NOT_FOUND') {
+        return {error: 'Unexpected error: Category not found by ID'};
+      }
+      throw error;
     }
   }
 
   async getRoots(): Promise<Array<object>> {
-    const roots = await this.find({where: {
-      ancestorIDs: {
-        exists: false
+    const roots = await this.find({
+      where: {
+        ancestorIDs: {
+          exists: false
+        }
       }
-    }});
+    });
     const responseArray: Array<object> = [];
-    for(const root of roots) {
+    for (const root of roots) {
       responseArray.push({
         categoryID: root.categoryID,
         categoryName: root.categoryName,
@@ -182,26 +188,30 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
   ): Promise<Array<object>> {
     const parent = await this.findById(categoryID);
     const responseArray: Array<object> = [];
-    for (const child of parent.childrenIDs) {
-      const currentChild = await this.findById(child);
-      responseArray.push({
-        categoryID: child,
-        categoryName: currentChild.categoryName,
-        defaultMaintanceSchedule: currentChild.defaultMaintanceSchedule,
-        expectedMaintanceTimeInMinutes: currentChild.expectedMaintanceTimeInMinutes
-      })
+    if (parent.childrenIDs) {
+      for (const child of parent.childrenIDs) {
+        const currentChild = await this.findById(child);
+        responseArray.push({
+          categoryID: child,
+          categoryName: currentChild.categoryName,
+          defaultMaintanceSchedule: currentChild.defaultMaintanceSchedule,
+          expectedMaintanceTimeInMinutes: currentChild.expectedMaintanceTimeInMinutes
+        })
+      }
     }
     return responseArray;
   }
 
   async getHierarchyTree(): Promise<Array<object>> {
-    const roots = await this.find({where: {
-      ancestorIDs: {
-        exists: false
+    const roots = await this.find({
+      where: {
+        ancestorIDs: {
+          exists: false
+        }
       }
-    }});
+    });
     const responseArray: Array<object> = [];
-    for(const root of roots) {
+    for (const root of roots) {
       const childrens = await this.buildTree(root);
       responseArray.push({
         categoryID: root.categoryID,
@@ -215,11 +225,13 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
   async buildTree(
     root: DeviceCategorys
   ): Promise<Array<object>> {
-    const descendantsOfRoot = await this.find({where: {
-      ancestorIDs: {
-        regexp: root.categoryID
+    const descendantsOfRoot = await this.find({
+      where: {
+        ancestorIDs: {
+          regexp: root.categoryID
+        }
       }
-    }});
+    });
     const responseArray: Array<{
       categoryID: string,
       categoryName: string,
@@ -238,7 +250,7 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
     }>
   ): Promise<Array<object>> {
     for (const descendant of descendantsOfRoot) {
-      if(descendant.parentID === parentID) {
+      if (descendant.parentID === parentID) {
         responseArray.push({
           categoryID: descendant.categoryID,
           categoryName: descendant.categoryName,
@@ -247,7 +259,7 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
       }
     }
     if (descendantsOfRoot.length === 0) return responseArray;
-    for(const foundChild of responseArray) {
+    for (const foundChild of responseArray) {
       const newChildArray: Array<{
         categoryID: string,
         categoryName: string,
@@ -291,21 +303,23 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
       whichChildToLowerInTree.parentID = newCategory.categoryID;
       whichChildToLowerInTree.ancestorIDs.push(newCategory.categoryID);
       await this.replaceById(whichChildID, whichChildToLowerInTree);
-      const findProfessionsIfExist = await professionRepo.find({where: {
-        categorysKnown: {
-          regexp: parentCategoryID
+      const findProfessionsIfExist = await professionRepo.find({
+        where: {
+          categorysKnown: {
+            regexp: parentCategoryID
+          }
         }
-      }});
+      });
       for (const profession of findProfessionsIfExist) {
         profession.categorysKnown.push(newCategory.categoryID);
         await professionRepo.replaceById(profession.professionID, profession)
       }
       return newCategory;
     } catch (error) {
-    if (error.code === 'ENTITY_NOT_FOUND') {
-      return 'Unexpected error: Category by id not found';
-    }
-    throw error;
+      if (error.code === 'ENTITY_NOT_FOUND') {
+        return 'Unexpected error: Category by id not found';
+      }
+      throw error;
     }
   }
 
@@ -330,17 +344,19 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
               expectedMaintanceTimeInMinutes: child.expectedMaintanceTimeInMinutes
             });
           } catch (error) {
-          if (error.code === 'ENTITY_NOT_FOUND') {
-            return 'Unexpected error: category not found by ID';
-          }
-          throw error;
+            if (error.code === 'ENTITY_NOT_FOUND') {
+              return 'Unexpected error: category not found by ID';
+            }
+            throw error;
           }
         }
-        const hasDeletedIDInAncestors = await this.find({where:{
-          ancestorIDs: {
-            regexp: categoryID
+        const hasDeletedIDInAncestors = await this.find({
+          where: {
+            ancestorIDs: {
+              regexp: categoryID
+            }
           }
-        }});
+        });
         if (hasDeletedIDInAncestors.length > 0) {
           for (const ancestor of hasDeletedIDInAncestors) {
             ancestor.ancestorIDs.splice(ancestor.ancestorIDs.indexOf(categoryID), 1);
@@ -359,10 +375,10 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
             currentAncestor.descendantsIDs.splice(currentAncestor.descendantsIDs.indexOf(categoryID, 1));
             await this.replaceById(ancestor, currentAncestor);
           } catch (error) {
-          if (error.code === 'ENTITY_NOT_FOUND') {
-            return 'Unexpected error: category not found by ID';
-          }
-          throw error;
+            if (error.code === 'ENTITY_NOT_FOUND') {
+              return 'Unexpected error: category not found by ID';
+            }
+            throw error;
           }
         }
         await this.delete(toDeleteCategory);
@@ -379,10 +395,10 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
           currentAncestor.descendantsIDs.splice(currentAncestor.descendantsIDs.indexOf(categoryID, 1));
           await this.replaceById(ancestor, currentAncestor);
         } catch (error) {
-        if (error.code === 'ENTITY_NOT_FOUND') {
-          return 'Unexpected error: category not found by ID';
-        }
-        throw error;
+          if (error.code === 'ENTITY_NOT_FOUND') {
+            return 'Unexpected error: category not found by ID';
+          }
+          throw error;
         }
       }
       for (const child of toDeleteCategory.childrenIDs) {
@@ -392,20 +408,20 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
           currentChild.parentID = toDeleteCategory.parentID;
           await this.replaceById(child, currentChild);
         } catch (error) {
-        if (error.code === 'ENTITY_NOT_FOUND') {
-          return 'Unexpected error: category not found by ID';
-        }
-        throw error;
+          if (error.code === 'ENTITY_NOT_FOUND') {
+            return 'Unexpected error: category not found by ID';
+          }
+          throw error;
         }
       }
       await this.delete(toDeleteCategory);
       await this.updateProfessionOnCategoryDeleted(profession, categoryID);
       return `Succesfully deleted ${toDeleteCategory.categoryName} from tree`;
     } catch (error) {
-    if (error.code === 'ENTITY_NOT_FOUND') {
-      return 'Unexpected error: category not found by ID';
-    }
-    throw error;
+      if (error.code === 'ENTITY_NOT_FOUND') {
+        return 'Unexpected error: category not found by ID';
+      }
+      throw error;
     }
   }
 
@@ -414,20 +430,22 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
     categoryID: string
   ): Promise<void> {
     try {
-      const professionsContainingCurrentCategoryID = await profession.find({where: {
-        categorysKnown: {
-          regexp: categoryID
+      const professionsContainingCurrentCategoryID = await profession.find({
+        where: {
+          categorysKnown: {
+            regexp: categoryID
+          }
         }
-      }});
+      });
       for (const currentProfession of professionsContainingCurrentCategoryID) {
         currentProfession.categorysKnown.splice(currentProfession.categorysKnown.indexOf(categoryID), 1);
         await profession.replaceById(currentProfession.professionID, currentProfession);
       }
     } catch (error) {
-    if (error.code === 'ENTITY_NOT_FOUND') {
-      return;
-    }
-    throw error;
+      if (error.code === 'ENTITY_NOT_FOUND') {
+        return;
+      }
+      throw error;
     }
   }
 
@@ -440,10 +458,10 @@ export class DeviceCategorysRepository extends DefaultCrudRepository<
     try {
       return await this.findById(id);
     } catch (error) {
-    if (error.code === 'ENTITY_NOT_FOUND') {
-      return false;
-    }
-    throw error;
+      if (error.code === 'ENTITY_NOT_FOUND') {
+        return false;
+      }
+      throw error;
     }
   }
 }
