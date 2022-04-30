@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   repository
 } from '@loopback/repository';
@@ -11,6 +12,7 @@ import {
 import {UserDataRepository} from '../repositories';
 import {professionUpdateRequestBody} from '../requestSchemas/employee';
 
+@authenticate('jwt')
 export class EmployeeController {
   constructor(
     @repository(UserDataRepository)

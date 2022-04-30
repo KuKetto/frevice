@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {repository} from '@loopback/repository';
 import {
   get, param, patch, post, requestBody, response
@@ -6,6 +7,7 @@ import {Task} from '../models';
 import {DeviceCategorysRepository, DeviceRepository, TaskRepository, UserDataRepository} from '../repositories';
 import {changeStatusRequestBody, createTaskRequestBody} from '../requestSchemas/task';
 
+@authenticate('jwt')
 export class TaskController {
   constructor(
     @repository(TaskRepository) public taskRepository : TaskRepository,

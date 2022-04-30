@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {UserRepository} from '@loopback/authentication-jwt';
 import {
   repository
@@ -17,6 +18,7 @@ export class RegisterOnHoldController {
     @repository(UserDataRepository) public userDataRepository: UserDataRepository
   ) {}
 
+  @authenticate('jwt')
   @post('/employee')
   @response(200, {
     description: 'Register',
