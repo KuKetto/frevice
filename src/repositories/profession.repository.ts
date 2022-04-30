@@ -76,6 +76,20 @@ export class ProfessionRepository extends DefaultCrudRepository<
     }
   }
 
+  async getRemainingProfessions(
+    selectedProfessions: Array<string>
+  ): Promise<Array<object>> {
+    const professions = await this.find();
+    const responseArray: Array<object> = [];
+    professions.forEach(profession => {
+      if (selectedProfessions.indexOf(profession.professionID) === -1) responseArray.push({
+        professionID: profession.professionID,
+        professionName: profession.professionName
+      });
+    })
+    return responseArray;
+  }
+
   async getProfessionInfo(
     professionID: string,
     category: DeviceCategorysRepository

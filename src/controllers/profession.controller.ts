@@ -9,7 +9,7 @@ import {
 } from '@loopback/rest';
 import {Profession} from '../models';
 import {DeviceCategorysRepository, DeviceRepository, ProfessionRepository} from '../repositories';
-import {newProfessionRequestBody, updateProfessionRequestBody} from '../requestSchemas/profession';
+import {newProfessionRequestBody, remainingProfessionsRequestBody, updateProfessionRequestBody} from '../requestSchemas/profession';
 
 @authenticate('jwt')
 export class ProfessionController {
@@ -38,6 +38,16 @@ export class ProfessionController {
   })
   async getProfessions(): Promise<Array<object>> {
     return this.professionRepository.getProfessions();
+  }
+
+  @post('/professions/remaining')
+  @response(200, {
+    description: 'Get list of remaining professions',
+  })
+  async getRemainingProfessions(
+    @requestBody(remainingProfessionsRequestBody) professions: {'professionArray': Array<string>}
+  ): Promise<Array<object>> {
+    return this.professionRepository.getRemainingProfessions(professions.professionArray);
   }
 
   @get('/professions/${professionID}')

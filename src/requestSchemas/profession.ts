@@ -38,3 +38,24 @@ export const updateProfessionRequestBody = {
     'application/json': {schema: updateProfessionSchema},
   },
 };
+
+const remainingProfessionsSchema: SchemaObject = {
+  type: 'object',
+  required: ['professionArray'],
+  properties: {
+    professionArray: {
+      type: 'array',
+      items: {
+        type: 'string'
+      }
+    },
+  },
+};
+
+export const remainingProfessionsRequestBody = {
+  description: 'The input of new template',
+  required: true,
+  content: {
+    'application/json': {schema: remainingProfessionsSchema},
+  },
+};
