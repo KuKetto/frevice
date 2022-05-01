@@ -33,8 +33,10 @@ export class RegisterOnHoldController {
     if (employee.role === "maintanceTechnician") {
       roleOrProfessions = "Karbantartó, végzettségei: ";
       for (const profession of employee.professions) {
-        const professionName = await this.professionRepository.findById(profession);
-        roleOrProfessions += `${professionName.professionName}, `
+        if (profession !== "") {
+          const professionName = await this.professionRepository.findById(profession);
+          roleOrProfessions += `${professionName.professionName}, `
+        }
       }
     }
     else if (employee.role === "operator") roleOrProfessions = "Operátor";

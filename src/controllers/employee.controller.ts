@@ -6,11 +6,11 @@ import {
   del,
   get,
   param,
-  patch, requestBody,
+  patch, post, requestBody,
   response
 } from '@loopback/rest';
 import {UserDataRepository} from '../repositories';
-import {professionUpdateRequestBody} from '../requestSchemas/employee';
+import {professionUpdateRequestBody, roleGetterRequestBody} from '../requestSchemas/employee';
 
 @authenticate('jwt')
 export class EmployeeController {
@@ -56,5 +56,15 @@ export class EmployeeController {
   async getEmployeeList(
   ): Promise<Array<object>> {
     return this.userDataRepository.getEmployeeList();
+  }
+
+  @post('/employee/role')
+  @response(200, {
+    description: 'get employee role',
+  })
+  async getUserRole(
+    @requestBody(roleGetterRequestBody) employee: {'userID': string},
+  ): Promise<string> {
+    return this.userDataRepository.getUserRole(employee.userID);
   }
 }

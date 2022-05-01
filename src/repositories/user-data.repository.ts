@@ -140,4 +140,8 @@ export class UserDataRepository extends DefaultCrudRepository<
     }
     return responseArray;
   }
+
+  async getUserRole(userID: string): Promise<string> {
+    return (await this.findById(userID)).role;
+  }
 }

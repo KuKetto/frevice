@@ -20,3 +20,21 @@ export const professionUpdateRequestBody = {
     'application/json': {schema: professionUpdateSchema},
   },
 };
+
+const roleGetterSchema: SchemaObject = {
+  type: 'object',
+  required: ['userID'],
+  properties: {
+    userID: {
+      type: 'string',
+    },
+  },
+};
+
+export const roleGetterRequestBody = {
+  description: 'The input of new template',
+  required: true,
+  content: {
+    'application/json': {schema: roleGetterSchema},
+  },
+};
