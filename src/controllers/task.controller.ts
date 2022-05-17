@@ -67,8 +67,8 @@ export class TaskController {
     description: 'Change status of task'
   })
   async changeStatus(
-    @requestBody(changeStatusRequestBody) newStatus: {'taskID': string, 'status': string}
+    @requestBody(changeStatusRequestBody) newStatus: {'taskID': string, 'status': string, 'reason': string}
   ): Promise<string> {
-    return this.taskRepository.changeStatus(newStatus.taskID, newStatus.status, this.deviceRepository, this.deviceCategorysRepository);
+    return this.taskRepository.changeStatus(newStatus.taskID, newStatus.status, newStatus.reason, this.deviceRepository, this.deviceCategorysRepository);
   }
 }

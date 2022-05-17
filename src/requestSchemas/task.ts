@@ -29,12 +29,15 @@ export const createTaskRequestBody = {
 
 const changeStatusSchema: SchemaObject = {
   type: 'object',
-  required: ['taskID', 'status'],
+  required: ['taskID', 'status', 'reason'],
   properties: {
     taskID: {
       type: 'string',
     },
     status: {
+      type: 'string',
+    },
+    reason: {
       type: 'string',
     },
   },

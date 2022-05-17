@@ -31,6 +31,11 @@ export class Task extends Entity {
   type: string;
 
   @property({
+    type: 'string',
+  })
+  reason: string;
+
+  @property({
     type: 'date',
   })
   date: Date;

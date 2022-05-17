@@ -69,7 +69,9 @@ export class TaskRepository extends DefaultCrudRepository<
         status: task.status,
         deviceLocation: device.location,
         deviceDesc: device.description,
-        deviceName: device.deviceName
+        deviceName: device.deviceName,
+        taskID: task.taskID,
+        deadline: task.date
       })
     }
     return responseArray;
@@ -98,12 +100,15 @@ export class TaskRepository extends DefaultCrudRepository<
   async changeStatus(
     taskID: string,
     status: string,
+    reason: string,
     deviceRepo: DeviceRepository,
     categoryRepo: DeviceCategorysRepository
   ): Promise<string> {
+    if (status === "rejected" && (reason === undefined || reason === "")) return "Can't reject without reason"
     const task = await this.findById(taskID);
     if (task === undefined) return "Unexpected error: ID not found";
     task.status = status;
+    if (status === "rejected") task.reason = reason;
     await this.replaceById(taskID, task);
     if (status === "Done") return this.ifDone(taskID, deviceRepo, categoryRepo);
     return "status changed";
