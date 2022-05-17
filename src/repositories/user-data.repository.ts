@@ -63,15 +63,22 @@ export class UserDataRepository extends DefaultCrudRepository<
   async addProfession(
     employeeID: string,
     professionID: string
-  ): Promise<string> {
-    const employee = await this.findOne({where: {
+  ): Promise<string | UserData> {
+    const employees = await this.find({where: {
       employeeData: {
-        regexp: employeeID
+        exists: true
       }
-    }});
-    if (employee === null) return "Unexcepted error: not found employee by id";
-    employee.employeeData.professionKnownIDs.push(professionID);
-    return "success";
+    }
+  });
+    for (const employee of employees) {
+      if (employee.employeeData.employeeID === employeeID) {
+        employee.employeeData.professionKnownIDs.push(professionID);
+        await this.replaceById(employee.userID, employee);
+      return employee;
+      }
+    }
+    return "Unexcepted error: not found employee by id";
+
   }
 
   async removeProfession(
@@ -143,5 +150,9 @@ export class UserDataRepository extends DefaultCrudRepository<
 
   async getUserRole(userID: string): Promise<string> {
     return (await this.findById(userID)).role;
+  }
+
+  async getEmployeeID(userID: string): Promise<string> {
+    return (await this.findById(userID)).employeeData.employeeID;
   }
 }

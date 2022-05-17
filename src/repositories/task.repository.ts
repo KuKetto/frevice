@@ -105,7 +105,7 @@ export class TaskRepository extends DefaultCrudRepository<
     if (task === undefined) return "Unexpected error: ID not found";
     task.status = status;
     await this.replaceById(taskID, task);
-    if (status === "done") return this.ifDone(taskID, deviceRepo, categoryRepo);
+    if (status === "Done") return this.ifDone(taskID, deviceRepo, categoryRepo);
     return "status changed";
   }
 

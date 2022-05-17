@@ -24,6 +24,14 @@ export class TaskController {
     return this.taskRepository.getTaskList(this.deviceRepository, this.deviceCategorysRepository);
   }
 
+  @get('/tasks')
+  @response(200, {
+    description: 'List all tasks without employee'
+  })
+  async getTasksList(): Promise<Task[]> {
+    return this.taskRepository.find();
+  }
+
   @get('/tasks/${deviceID}/employees')
   @response(200, {
     description: 'List all employees with required professions'

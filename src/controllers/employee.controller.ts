@@ -9,6 +9,7 @@ import {
   patch, post, requestBody,
   response
 } from '@loopback/rest';
+import {UserData} from '../models/user-data.model';
 import {UserDataRepository} from '../repositories';
 import {professionUpdateRequestBody, roleGetterRequestBody} from '../requestSchemas/employee';
 
@@ -25,7 +26,7 @@ export class EmployeeController {
   })
   async addProfession(
     @requestBody(professionUpdateRequestBody) employeeProfession: {'employeeID': string, 'professionID': string},
-  ): Promise<string> {
+  ): Promise<string | UserData> {
     return this.userDataRepository.addProfession(employeeProfession.employeeID, employeeProfession.professionID);
   }
 
@@ -66,5 +67,15 @@ export class EmployeeController {
     @requestBody(roleGetterRequestBody) employee: {'userID': string},
   ): Promise<string> {
     return this.userDataRepository.getUserRole(employee.userID);
+  }
+
+  @post('/employee/id')
+  @response(200, {
+    description: 'get employee role',
+  })
+  async getEmployeeID(
+    @requestBody(roleGetterRequestBody) employee: {'userID': string},
+  ): Promise<string> {
+    return this.userDataRepository.getEmployeeID(employee.userID);
   }
 }
