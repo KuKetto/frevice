@@ -71,7 +71,8 @@ export class TaskRepository extends DefaultCrudRepository<
         deviceDesc: device.description,
         deviceName: device.deviceName,
         taskID: task.taskID,
-        deadline: task.date
+        deadline: task.date,
+        categoryID: device.categoryID
       })
     }
     return responseArray;
