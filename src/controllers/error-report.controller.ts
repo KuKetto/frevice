@@ -1,9 +1,9 @@
 import {repository} from '@loopback/repository';
 import {
-  get, param, post, requestBody, response
+  get, param, patch, post, requestBody, response
 } from '@loopback/rest';
-import {ErrorReport} from '../models';
-import {DeviceCategorysRepository, DeviceRepository, ErrorReportRepository} from '../repositories';
+import {ErrorReport, Task} from '../models';
+import {DeviceCategorysRepository, DeviceRepository, ErrorReportRepository, TaskRepository, UserDataRepository} from '../repositories';
 import {errorReportRequestBody} from '../requestSchemas/error_report';
 
 export class ErrorReportController {
@@ -14,6 +14,10 @@ export class ErrorReportController {
     public deviceCategorysRepository : DeviceCategorysRepository,
     @repository(DeviceRepository)
     public deviceRepository : DeviceRepository,
+    @repository(DeviceRepository)
+    public taskRepository : TaskRepository,
+    @repository(DeviceRepository)
+    public userDataRepository : UserDataRepository,
   ) {}
 
   @get('/error-reports')
@@ -29,7 +33,7 @@ export class ErrorReportController {
   async getErrorInfo(
     @param.path.string('errorID') errorID: string
   ): Promise<object> {
-    return this.errorReportRepository.getErrorInfo(errorID, this.deviceRepository, this.deviceCategorysRepository);
+    return this.errorReportRepository.getErrorInfo(errorID, this.deviceRepository, this.deviceCategorysRepository, this.userDataRepository);
   }
 
   @post('/error-reports')
@@ -39,5 +43,14 @@ export class ErrorReportController {
     @requestBody(errorReportRequestBody) error: {'fullname': string, 'phone': string, 'productID': string, 'desc': string},
   ): Promise<ErrorReport> {
     return this.errorReportRepository.newErrorReport(error.fullname, error.phone, error.productID, error.desc);
+  }
+
+  @patch('/error-reports')
+  @response(200, {
+    description: 'Make error to task',})
+  async makeErrorToTask(
+    @requestBody(errorReportRequestBody) error: {'deviceID': string, 'employeeID': string},
+  ): Promise<Task> {
+    return this.errorReportRepository.makeErrorToTask(error.deviceID, error.employeeID, this.taskRepository);
   }
 }
